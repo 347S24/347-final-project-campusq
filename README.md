@@ -12,10 +12,9 @@
 ## The Team
 
 Mostly just to make sure you each have access and can pull and push to the repo, add your name here:
-1. IName
-1. MeName
-1. MeName
-1. MineName
+1. Wynn Ames
+1. Thomas Brickhouse
+1. Shelsey Vega
 
 ## Scaffolding
 
