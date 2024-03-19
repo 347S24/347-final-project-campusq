@@ -5,7 +5,7 @@ from factory import Faker
 from factory import post_generation
 from factory.django import DjangoModelFactory
 
-from tictactoe.users.models import User
+from campusq.users.models import User
 
 
 class UserFactory(DjangoModelFactory):

@@ -6,7 +6,7 @@ from django.views.generic import DetailView
 from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
-from tictactoe.users.models import User
+from campusq.users.models import User
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):

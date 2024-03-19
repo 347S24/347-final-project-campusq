@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from allauth.socialaccount.models import SocialLogin
     from django.http import HttpRequest
 
-    from tictactoe.users.models import User
+    from campusq.users.models import User
 
 
 class AccountAdapter(DefaultAccountAdapter):

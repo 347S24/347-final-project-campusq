@@ -12,12 +12,12 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from tictactoe.users.forms import UserAdminChangeForm
-from tictactoe.users.models import User
-from tictactoe.users.tests.factories import UserFactory
-from tictactoe.users.views import UserRedirectView
-from tictactoe.users.views import UserUpdateView
-from tictactoe.users.views import user_detail_view
+from campusq.users.forms import UserAdminChangeForm
+from campusq.users.models import User
+from campusq.users.tests.factories import UserFactory
+from campusq.users.views import UserRedirectView
+from campusq.users.views import UserUpdateView
+from campusq.users.views import user_detail_view
 
 pytestmark = pytest.mark.django_db
 
