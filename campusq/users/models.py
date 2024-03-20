@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.db.models import CharField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -24,3 +25,21 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+    
+class Professor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    department = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    office = models.CharField(max_length=100)
+    phone = models.CharField(max_length=100)
+    email = models.CharField(max_length=100)
+    office_hours = models.CharField(max_length=100)
+    def __str__(self):
+        return self.user.name
+    
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    major = models.CharField(max_length=100)
+    year = models.CharField(max_length=100)
+    def __str__(self):
+        return self.user.name
