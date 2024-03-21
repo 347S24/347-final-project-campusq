@@ -36,7 +36,7 @@ It's not exactly time yet, but if you're excited I don't want to stand in the wa
 2. Create new conda environment for project
 3. Activate environment, then navigate to requirements dir in terminal and run **pip install -r local.txt**
 4. Navigate to frontend dir and run **npm install**
-5. run <createdb campusq> (ensure postgres app is running first)
+5. run **createdb campusq** (ensure postgres app is running first)
 
  ## Running local dev servers
  1. Frontend: navigate to frontend dir, run **npm run dev**
