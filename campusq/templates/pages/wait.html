@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher's Office Hours Waiting Room{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Office Hours Waiting Room</h1>
+    <p>Your position in line:</p>
+    <div id="progressBarContainer">
+        <div id="progressBar"></div>
+    </div>
+    <p id="positionText"></p>
+</div>
+
+<!-- move to a css file -->
+<style>
+    #progressBarContainer {
+        width: 100%;
+        background-color: #ddd;
+        padding: 3px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+    #progressBar {
+        height: 20px;
+        background-color: #4CAF50;
+        width: 0%; /* Initial width */
+        border-radius: 3px;
+        text-align: center;
+        line-height: 20px;
+        color: white;
+    }
+</style>
+
+<!-- move to javascript files and edit so it is actually dynamically getting the positions and total -->
+<script>
+    function updateWaitingList() {
+        const totalStudents = 5; // Total number of students in line, dynamically fetched
+        const yourPosition = 2; // Your dynamic position in line
+        
+        // Calculate width of the progress bar based on your position
+        const progressPercentage = ((totalStudents - yourPosition + 1) / totalStudents) * 100;
+        
+        // Update progress bar width and text
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = progressPercentage + '%';
+        progressBar.textContent = `Your Position: ${yourPosition} of ${totalStudents}`;
+        
+        // Optionally, update text below the progress bar
+        const positionText = document.getElementById('positionText');
+        positionText.textContent = `You are currently number ${yourPosition} in line.`;
+    }
+
+    // Mockup of periodic update (replace with actual data fetching logic)
+    setInterval(updateWaitingList, 5000); // Update list every 5 seconds
+</script>
+{% endblock %}
