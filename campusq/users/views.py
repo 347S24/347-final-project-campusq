@@ -43,3 +43,30 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import OfficeHourSession, Professor
+from django.contrib import messages
+
+@login_required
+def start_office_hours(request):
+    try:
+        # Attempt to get the professor instance for the logged-in user
+        professor = Professor.objects.get(user=request.user)
+    except Professor.DoesNotExist:
+        # If the user is not a professor, add a message and redirect
+        messages.error(request, "You are not authorized to start office hours.")
+        return redirect('home')
+
+    # Check if there's an already active session for this professor
+    active_session = OfficeHourSession.objects.filter(professor=professor, is_active=True).exists()
+    if not active_session:
+        # If no active session, create a new office hours session
+        OfficeHourSession.objects.create(professor=professor)
+        messages.success(request, "Office hours started successfully.")
+        return redirect('waiting_list')
+    else:
+        # If an active session exists, inform the user
+        messages.info(request, "You already have an active office hours session.")
+        return redirect('home')

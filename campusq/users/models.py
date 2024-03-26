@@ -43,3 +43,11 @@ class Student(models.Model):
     year = models.CharField(max_length=100)
     def __str__(self):
         return self.user.name
+
+class OfficeHourSession(models.Model):
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    def __str__(self):
+        return f"{self.professor.user.username}'s Office Hours"
