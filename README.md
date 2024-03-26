@@ -12,6 +12,7 @@
 ## The Team
 
 Mostly just to make sure you each have access and can pull and push to the repo, add your name here:
+
 1. Wynn Ames
 1. Thomas Brickhouse
 1. Shelsey Vega
@@ -23,6 +24,8 @@ In the Wedge of Django, they show you how to work with the [django-crash-starter
 Talk with your team and choose one of these cookiecutter templates and run it to get things rolling.
 
 ## Task Board
+
+Test
 
 It's not exactly time yet, but if you're excited I don't want to stand in the way. For (at least) the last 6 weeks of the semester, we'll organize your work into 2-week "Sprints" using a "task board". GitHub has a feature that the unfortunately call "projects" that we can use to plan and coordinate. There are many templates available, perhaps the "Featued" template titled "Iterative Developement" would be a good choice.
 
