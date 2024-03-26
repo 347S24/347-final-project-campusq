@@ -5,6 +5,7 @@ import Login from "./components/login/Login.jsx";
 import Student from "./components/student/Student.jsx";
 import Instructor from "./components/instructor/Instructor.jsx";
 import EditQuestions from "./components/instructor/editquestions/EditQuestions.jsx";
+import Wait from "./components/instructor/waitroom/wait.jsx"; // Ensure this path is correct
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/instructor/edit",
     element: <EditQuestions />,
+  },
+  {
+    path: "/instructor/waitroom",
+    element: <Wait />,
   },
 ]);
 

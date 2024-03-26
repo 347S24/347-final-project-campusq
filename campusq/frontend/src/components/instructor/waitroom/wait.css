@@ -1,0 +1,15 @@
+#progressBarContainer {
+    width: 100%;
+    background-color: #ddd;
+    padding: 3px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+#progressBar {
+    height: 20px;
+    background-color: #4CAF50;
+    width: 0%; /* Initial width */
+    border-radius: 3px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
