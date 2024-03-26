@@ -12,6 +12,7 @@
 ## The Team
 
 Mostly just to make sure you each have access and can pull and push to the repo, add your name here:
+
 1. Wynn Ames
 1. Thomas Brickhouse
 1. Shelsey Vega
@@ -24,9 +25,22 @@ Talk with your team and choose one of these cookiecutter templates and run it to
 
 ## Task Board
 
+Test
+
 It's not exactly time yet, but if you're excited I don't want to stand in the way. For (at least) the last 6 weeks of the semester, we'll organize your work into 2-week "Sprints" using a "task board". GitHub has a feature that the unfortunately call "projects" that we can use to plan and coordinate. There are many templates available, perhaps the "Featued" template titled "Iterative Developement" would be a good choice.
 
 1. Find the "Projects" tab at the top of your repo in github
 2. Click the arrow beside the green "Link Project" button and choose "New Project"
 3. I guess now you also have to click "New Project" 🙄
 4. find the "iterative development" template and choose it.
+
+## Project Setup
+1. Clone repository
+2. Create new conda environment for project
+3. Activate environment, then navigate to requirements dir in terminal and run **pip install -r local.txt**
+4. Navigate to frontend dir and run **npm install**
+5. run **createdb campusq** (ensure postgres app is running first)
+
+ ## Running local dev servers
+ 1. Frontend: navigate to frontend dir, run **npm run dev**
+ 2. Backend: navigate to root folder, run **python manage.py runserver**

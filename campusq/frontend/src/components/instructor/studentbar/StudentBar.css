@@ -1,0 +1,12 @@
+
+
+#name {
+  color: black;
+  border: 1px solid black;
+}
+
+.item {
+  padding: .5em;
+  border-radius: 10px;
+  border: 1px solid black;
+}
