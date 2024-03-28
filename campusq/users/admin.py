@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import User
+from .models import User, Professor, Student, OfficeHourSession
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     # Force the `admin` sign in process to go through the `django-allauth` workflow:
@@ -37,3 +37,19 @@ class UserAdmin(auth_admin.UserAdmin):
     )
     list_display = ["username", "name", "is_superuser"]
     search_fields = ["name"]
+
+@admin.register(Professor)
+class ProfessorAdmin(admin.ModelAdmin):
+    list_display = ['user', 'department', 'title', 'office', 'phone', 'email', 'office_hours']
+    search_fields = ['user__name', 'department', 'title', 'office', 'phone', 'email']
+
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'major', 'year']
+    search_fields = ['user__name', 'major', 'year']
+
+@admin.register(OfficeHourSession)
+class OfficeHourSessionAdmin(admin.ModelAdmin):
+    list_display = ['professor', 'start_time', 'end_time', 'is_active']
+    list_filter = ['is_active']
+    search_fields = ['professor__user__name']

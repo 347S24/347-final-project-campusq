@@ -1,12 +1,24 @@
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
+import "./EditQuestions.css";
+import {Link} from "react-router-dom";
 
 const QuestionBar = ({ id, deleteQuestion, question }) => {
   return (
-    <div>
-      <input type="text" placeholder="Enter Question" />
+    <div className="question-bar-wrapper">
+      <textarea
+        className="question-input"
+        type="text"
+        placeholder="Enter Question"
+      />
 
-      <button onClick={() => deleteQuestion(id)}>delete</button>
+      <button
+        className="generic-button"
+        id="question-bar-delete"
+        onClick={() => deleteQuestion(id)}
+      >
+        delete
+      </button>
     </div>
   );
 };
@@ -18,7 +30,6 @@ export default function EditQuestions() {
    to populate the page*/
   }
   const [questions, setQuestions] = useState([]);
-  
 
   const addQuestion = () => {
     setQuestions((questions) => {
@@ -31,12 +42,14 @@ export default function EditQuestions() {
   };
 
   return (
-    <div>
+    <div className="">
       <h1>Edit Questions</h1>
       <div>
-        <button>Back</button>
-        <button onClick={addQuestion}>add question</button>
-        <button>Save</button> /{" "}
+        <Link to={'/instructor'}><button className="generic-button">Back</button></Link>
+        <button className="generic-button" onClick={addQuestion}>
+          add question
+        </button>
+        <button className="generic-button">Save</button>{" "}
         {/*On click, this will send a post request to our
                                    api to update the database*/}
         {questions.map((question) => (

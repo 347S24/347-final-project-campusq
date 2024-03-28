@@ -6,6 +6,8 @@ from django.urls import include
 from django.urls import path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
+from campusq.users.api import api
+
 
 from .views import HomeView
 
@@ -13,6 +15,7 @@ from .views import HomeView
 urlpatterns = [
     # path("", TemplateView.as_view(template_name="index.html"), name="home"),
     path("", HomeView.as_view(), name="home"),
+    path('api/', api.urls ),
     path(
         "about/",
         TemplateView.as_view(template_name="pages/about.html"),
