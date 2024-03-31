@@ -3,6 +3,8 @@ from django.db import models
 from django.db.models import CharField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+import random
+import string
 
 
 class User(AbstractUser):
@@ -49,5 +51,30 @@ class OfficeHourSession(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    questions = models.CharField(null=True, blank=True, max_length=1000)
+    id = models.CharField(primary_key=True, max_length=4, unique=True)
+
+    def generate_unique_code():
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        while OfficeHourSession.objects.filter(id=code).exists():
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        return code
+
+    def set_questions(self, data):
+        self.questions = ','.join(data)
+    def get_questions(self):
+        return self.questions.split(',')
+    
     def __str__(self):
         return f"{self.professor.user.username}'s Office Hours"
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.id:
+            self.id = self.generate_unique_code()
+    
+    def generate_unique_code(self):
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        while OfficeHourSession.objects.filter(id=code).exists():
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        return code

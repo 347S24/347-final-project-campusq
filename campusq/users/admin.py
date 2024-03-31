@@ -53,3 +53,5 @@ class OfficeHourSessionAdmin(admin.ModelAdmin):
     list_display = ['professor', 'start_time', 'end_time', 'is_active']
     list_filter = ['is_active']
     search_fields = ['professor__user__name']
+    readonly_fields = ['id']
+    
