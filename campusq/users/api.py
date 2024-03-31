@@ -26,7 +26,8 @@ def join_office_hours(request):
     try:
         code = request.GET.get('code', '')
         session = OfficeHourSession.objects.get(id=code.upper())
-        response = JsonResponse({"questions": session.questions}, status=200)
+        response = JsonResponse({"questions": session.questions,
+                                 "instructor": session.professor.user.name}, status=200)
         response["Access-Control-Allow-Origin"] = "*"
         response["Content-Type"] = "application/json"
         return response

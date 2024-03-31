@@ -2,9 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import Login from "./components/login/Login.jsx";
-import Student from "./components/student/Student.jsx";
+import StudentCode from "./components/student/studentcode/StudentCode.jsx";
 import Instructor from "./components/instructor/Instructor.jsx";
 import EditQuestions from "./components/instructor/editquestions/EditQuestions.jsx";
+import StudentQuestions from "./components/student/studentquestions/StudentQuestions.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -18,8 +19,12 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "/student",
-    element: <Student />,
+    path: "/student/code",
+    element: <StudentCode />,
+  },
+  {
+    path: "/student/questions",
+    element: <StudentQuestions />,
   },
   {
     path: "/instructor",
