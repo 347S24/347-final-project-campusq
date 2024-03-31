@@ -1,10 +1,16 @@
-import "./Student.css";
+import { redirect } from "react-router-dom";
+import "./StudentCode.css";
 import React, { useState } from "react";
+import StudentQuestions from "../studentquestions/StudentQuestions";
+import { Navigate } from "react-router-dom";
 
-export default function Student() {
+export default function StudentCode() {
   const [code, setCode] = useState("");
   const [questions, setQuestions] = useState("");
   const [error, setError] = useState("");
+  const [professor, setProfessor] = useState("");
+
+  const [redirect, setRedirect] = useState(false);
 
   const handleSubmit = async () => {
     try {
@@ -25,6 +31,9 @@ export default function Student() {
         const data = await response.json();
         setQuestions(data.questions);
         setError("");
+        setProfessor(data.instructor);
+        setRedirect(true);
+        console.log(redirect);
       } else if (response.status == 404) {
         setQuestions("");
         setError("Invalid code");
@@ -39,6 +48,20 @@ export default function Student() {
       setError("An error occurred");
     }
   };
+
+  if (redirect) {
+    console.log("assa");
+    return (
+      <Navigate
+        to="/student/questions"
+        state={{
+          code: code,
+          questions: questions,
+          professor: professor,
+        }}
+      />
+    );
+  }
 
   return (
     <div id="wrapper">
@@ -56,6 +79,7 @@ export default function Student() {
         </button>
         {error && <div>{error}</div>}
         {questions && <div>{questions}</div>}
+        {professor && <div>{professor}</div>}
       </div>
     </div>
   );
