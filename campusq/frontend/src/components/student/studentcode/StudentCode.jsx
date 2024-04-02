@@ -50,7 +50,6 @@ export default function StudentCode() {
   };
 
   if (redirect) {
-    console.log("assa");
     return (
       <Navigate
         to="/student/questions"
