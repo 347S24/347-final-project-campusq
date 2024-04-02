@@ -27,6 +27,11 @@ urlpatterns = [
     path("users/", include("campusq.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
+    # path(
+    #     "wait/",
+    #     TemplateView.as_view(template_name="pages/wait.html"),
+    #     name="wait",
+    # ),
     path(
         "wait/",
         TemplateView.as_view(template_name="pages/wait.html"),
