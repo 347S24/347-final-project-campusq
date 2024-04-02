@@ -1,0 +1,11 @@
+.question-answer-wrapper {
+  margin: 1em;
+  padding: .5em;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.back-button {
+ background-color: rgb(229, 116, 116);
+ color: white;
+}

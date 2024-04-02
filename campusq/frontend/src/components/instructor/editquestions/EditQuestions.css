@@ -1,0 +1,39 @@
+.generic-button {
+  
+  border-radius: 10px;
+  border: 0px solid black;
+  color: white;
+  font-weight: 600;
+  background-color: #450084;
+
+  
+}
+.generic-button:hover {
+  background-color: #CBB677;
+}
+
+.question-bar-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  
+}
+
+#question-bar-delete {
+  height: 2em;
+  width: 4em;
+  color: white;
+  background-color: #A4232B;
+  
+}
+
+#question-bar-delete:hover {
+  background-color: #e27373;
+}
+
+.question-input {
+  height: 75px;
+  width: 300px;
+  resize: none;
+}
