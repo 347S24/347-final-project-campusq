@@ -46,7 +46,7 @@ def canvas_login_callback(request):
     data = response.json()
     access_token = data.get('access_token', None)
 
-    redirect_url = "http://localhost:5173/student/code"
+    redirect_url = "http://localhost:8000/student/code"
     redirect_response = HttpResponseRedirect(redirect_url)
     redirect_response.set_cookie('access_token', access_token)
     return redirect_response

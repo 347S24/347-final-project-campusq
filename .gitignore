@@ -276,3 +276,5 @@ campusq/media/
 .pytest_cache/
 
 **/static/assets/
+
+campusq/templates/
