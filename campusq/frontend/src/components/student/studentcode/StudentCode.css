@@ -1,36 +1,70 @@
 button {
-  color: green;
-  height: 4em;
-  width: 10em;
-  
+  color: white;
+  background-color: #450084;
+  font-size: 55px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+input[type="text"],
+button {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  width: 200px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
 }
 
 #wrapper {
-	display:flex;
-  flex-direction: column;
-	height:100vh;
-	
+  margin: 0;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  height: 90vh;
 }
 
-
-
-.main-container {
-  
-  font-weight: bold;
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  
-  
-  
-
+#title {
+  font-size: 90px;
+  margin-bottom: 30px;
 }
 
 #input {
-  font-size: 4em;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #450084;
+  border-radius: 5px;
+  width: 200px;
+  height: 40px;
+  margin-bottom: 10px;
   text-align: center;
-  width: 2.2em;
+}
+
+#button-part {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#login-button {
+    border: 2px solid #450084;
+}
+
+#login-button:hover {
+    background-color: #64269e; /* Change hover color */
+}
+
+#error-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

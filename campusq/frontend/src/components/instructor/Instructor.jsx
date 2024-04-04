@@ -9,7 +9,7 @@ export default function Instructor() {
   const addStudent = () => {
     setStudent([
       ...student,
-      <StudentBar name={`student #${student.length}`} />,
+      <StudentBar name={`student #${student.length + 1}`} />, // Added + 1 becuase current student.length count starts at 0
     ]);
   };
 
@@ -20,8 +20,8 @@ export default function Instructor() {
   };
   return (
     <div style={{}}>
-      <button onClick={addStudent}>add student</button>
-      <button onClick={inviteStudent}>invite student</button>
+      <button onClick={addStudent}>Add Student</button>
+      <button onClick={inviteStudent}>Invite Student</button>
       <Link to={'/instructor/edit'}>
         <button>Edit questions</button>
       </Link>
