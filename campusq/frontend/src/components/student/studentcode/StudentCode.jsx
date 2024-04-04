@@ -75,7 +75,7 @@ export default function StudentCode() {
   //   };
 
   //   fetch(userDataURL, {
-  //     method: "GET", // or any other HTTP method like POST, PUT, DELETE, etc.
+  //     method: "GET",
   //     headers: headers,
   //   })
   //     .then((response) => {
@@ -101,7 +101,7 @@ export default function StudentCode() {
     const headers = {};
 
     fetch(userDataURL, {
-      method: "GET", // or any other HTTP method like POST, PUT, DELETE, etc.
+      method: "GET",
       headers: headers,
     })
       .then((response) => {
