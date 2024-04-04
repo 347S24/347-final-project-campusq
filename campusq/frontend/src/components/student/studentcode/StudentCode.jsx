@@ -75,7 +75,7 @@ export default function StudentCode() {
   //   };
 
   //   fetch(userDataURL, {
-  //     method: "GET", // or any other HTTP method like POST, PUT, DELETE, etc.
+  //     method: "GET",
   //     headers: headers,
   //   })
   //     .then((response) => {
@@ -101,7 +101,7 @@ export default function StudentCode() {
     const headers = {};
 
     fetch(userDataURL, {
-      method: "GET", // or any other HTTP method like POST, PUT, DELETE, etc.
+      method: "GET",
       headers: headers,
     })
       .then((response) => {
@@ -124,20 +124,27 @@ export default function StudentCode() {
       <div>Logged in: {studentName}</div>
       <button>logout</button>
       <div className="main-container">
-        <div>Enter teacher office hours code:</div>
-        <input
-          id="input"
-          type="text"
-          name="code"
-          maxLength={4}
-          onChange={(event) => setCode(event.target.value)}
-        />
-        <button type="submit" onClick={handleSubmit}>
-          Submit
-        </button>
-        {error && <div>{error}</div>}
-        {questions && <div>{questions}</div>}
-        {professor && <div>{professor}</div>}
+        <div id="header">
+          <h1 id="title">CampusQ</h1>
+        </div>
+        <div id="button-part">
+          <input
+            id="input"
+            type="text"
+            name="code"
+            placeholder="Office Hours Code"
+            maxLength={4}
+            onChange={(event) => setCode(event.target.value)}
+          />
+          <button id="login-button" type="submit" onClick={handleSubmit}>
+            Submit
+          </button>
+          </div>
+          <div id="error-area">
+            {error && <div>{error}</div>}
+            {questions && <div>{questions}</div>}
+            {professor && <div>{professor}</div>}
+          </div>
       </div>
     </div>
   );
