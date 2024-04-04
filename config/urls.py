@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include
+from django.urls import include, re_path
 from django.urls import path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
@@ -13,8 +13,9 @@ from .views import HomeView
 
 
 urlpatterns = [
-    # path("", TemplateView.as_view(template_name="index.html"), name="home"),
+    # path("", TemplateView.as_view(template_name="index.html"), name="home"),<<<<<<< api-update
     path("", api.urls),
+    
     path('api/', api.urls ),
     
     path(
@@ -28,11 +29,17 @@ urlpatterns = [
     path("users/", include("campusq.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
+    # path(
+    #     "wait/",
+    #     TemplateView.as_view(template_name="pages/wait.html"),
+    #     name="wait",
+    # ),
     path(
         "wait/",
         TemplateView.as_view(template_name="pages/wait.html"),
         name="wait",
     ),
+    re_path(".*", HomeView.as_view(), name="home"),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
