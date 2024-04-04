@@ -1,3 +1,35 @@
 .login-button {
-  color: green;
+  color: white;
+  background-color: #450084;
+  font-size: 15px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
 }
+
+.login-button:hover {
+    background-color: #64269e; /* Change hover color */
+}
+
+#main {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 90vh;
+}
+
+#buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#title {
+  font-size: 90px;
+  margin-bottom: 30px;
+}
+
