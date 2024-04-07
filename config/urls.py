@@ -13,7 +13,7 @@ from .views import HomeView
 
 
 urlpatterns = [
-    # path("", TemplateView.as_view(template_name="index.html"), name="home"),<<<<<<< api-update
+    path("", TemplateView.as_view(template_name="index.html"), name="home"),
     # path("", api.urls),
     
     path('api/', api.urls ),
