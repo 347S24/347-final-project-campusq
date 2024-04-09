@@ -52,19 +52,6 @@ export default function StudentCode() {
     }
   };
 
-  if (redirect) {
-    return (
-      <Navigate
-        to="/student/questions"
-        state={{
-          code: code,
-          questions: questions,
-          professor: professor,
-        }}
-      />
-    );
-  }
-
   // useEffect(() => {
   //   const cookies = new Cookies();
   //   const accessToken = cookies.get("access_token");
@@ -119,6 +106,19 @@ export default function StudentCode() {
       });
   }, []);
 
+  if (redirect) {
+    return (
+      <Navigate
+        to="/student/questions"
+        state={{
+          code: code,
+          questions: questions,
+          professor: professor,
+        }}
+      />
+    );
+  }
+
   return (
     <div id="wrapper">
       <div>Logged in: {studentName}</div>
@@ -139,12 +139,12 @@ export default function StudentCode() {
           <button id="login-button" type="submit" onClick={handleSubmit}>
             Submit
           </button>
-          </div>
-          <div id="error-area">
-            {error && <div>{error}</div>}
-            {questions && <div>{questions}</div>}
-            {professor && <div>{professor}</div>}
-          </div>
+        </div>
+        <div id="error-area">
+          {error && <div>{error}</div>}
+          {questions && <div>{questions}</div>}
+          {professor && <div>{professor}</div>}
+        </div>
       </div>
     </div>
   );
