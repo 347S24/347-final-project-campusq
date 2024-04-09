@@ -104,3 +104,23 @@ def get_student_info(request, access_token="error"):
     
     return response
 
+@api.get("/active_office_hour_session")
+def active_office_hour_session(request):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=403)
+
+    try:
+        professor = Professor.objects.get(user=user)
+        session = OfficeHourSession.objects.filter(professor=professor, is_active=True).first()
+        if session:
+            return JsonResponse({
+                'session_id': session.id,
+                'start_time': session.start_time.isoformat(),
+                'end_time': session.end_time.isoformat() if session.end_time else None,
+                'is_active': session.is_active,
+                'questions': session.questions.split(',')
+            })
+    except Professor.DoesNotExist:
+        return JsonResponse({'error': 'User is not a professor'}, status=403)
+

@@ -2,27 +2,28 @@ import React, { useState, useEffect } from 'react';
 import './wait.css';
 
 export default function Wait() {
-    const [totalStudents, setTotalStudents] = useState(5); // Initially set to 5, adjust as necessary
-    const [yourPosition, setYourPosition] = useState(2); // Initially set to 2, adjust as necessary
+    const [totalStudents, setTotalStudents] = useState(5); // Adjust initial state as necessary
+    const [yourPosition, setYourPosition] = useState(2); // Adjust initial state as necessary
 
     useEffect(() => {
-        const updateWaitingList = () => {
-            // Here you would fetch the actual data from the server
-            // For now, we're using static values
-            // setTotalStudents(fetchedTotalStudents);
-            // setYourPosition(fetchedYourPosition);
-
-            // Example: Simulate fetching data
-            setTotalStudents(5); // Static value, replace with fetched data
-            setYourPosition(2); // Static value, replace with fetched data
+        const fetchActiveSession = async () => {
+            try {
+                const response = await fetch('/api/active_office_hour_session/');
+                if (response.ok) {
+                    const data = await response.json();
+                    setTotalStudents(/* Logic to determine total students */);
+                    setYourPosition(/* Logic to determine your position */);
+                    // Update other state variables or logic as needed based on `data`
+                } else {
+                    console.error('No active session or not authorized');
+                    // Additional error handling or state updates can go here
+                }
+            } catch (error) {
+                console.error('Error fetching active session:', error);
+            }
         };
 
-        // Call the update function once immediately and then set the interval
-        updateWaitingList();
-        const intervalId = setInterval(updateWaitingList, 5000); // Update every 5 seconds
-
-        // Clean-up function to clear the interval when the component unmounts
-        return () => clearInterval(intervalId);
+        fetchActiveSession();
     }, []); // Empty dependency array means this effect runs once on mount and then on unmount
 
     // Calculate progress percentage
