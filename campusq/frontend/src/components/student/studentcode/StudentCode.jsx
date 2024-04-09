@@ -120,13 +120,20 @@ export default function StudentCode() {
   }
 
   return (
-    <div id="wrapper">
-      <div>Logged in: {studentName}</div>
-      <button>logout</button>
-      <div className="main-container">
-        <div id="header">
+    <div id="body">
+      <div id="header">
+        <div id="top-left">
+          <div>Logged in: {studentName}</div>
+          <button>logout</button>
+        </div>
+        <div id="middle">
           <h1 id="title">CampusQ</h1>
         </div>
+        <div id="top-left">
+          <h1>Something</h1>
+        </div>
+      </div>
+      <div className="main-container">
         <div id="button-part">
           <input
             id="input"
