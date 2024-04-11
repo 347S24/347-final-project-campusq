@@ -67,11 +67,20 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  padding: 10px;
+  width: 100vw;
+  height: 100vh;
 }
 
-.top-left, .top-right {
+.top-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-left button {
+  margin-top: 5px;
+}
+
+.top-left, #middle {
   flex: 1;
 }
 
@@ -80,5 +89,10 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: auto;
+  margin-bottom: auto;
+  text-align: center;
 }
+
+
+
