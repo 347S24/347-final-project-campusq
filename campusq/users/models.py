@@ -55,6 +55,9 @@ class OfficeHourSession(models.Model):
     questions = models.CharField(null=True, blank=True, max_length=1000)
     id = models.CharField(primary_key=True, max_length=4, unique=True)
 
+    def get_waitlist(self):
+        return Waitlist.objects.filter(session=self).select_related('student')
+
     def generate_unique_code():
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
         while OfficeHourSession.objects.filter(id=code).exists():
@@ -73,9 +76,14 @@ class OfficeHourSession(models.Model):
         super().__init__(*args, **kwargs)
         if not self.id:
             self.id = self.generate_unique_code()
-    
-    def generate_unique_code(self):
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        while OfficeHourSession.objects.filter(id=code).exists():
-            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        return code
+
+class Waitlist(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    session = models.ForeignKey('OfficeHourSession', on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['joined_at']  # Ensures the waitlist is ordered by join time
+
+    def __str__(self):
+        return f"{self.student.user.name} for {self.session.professor.user.name}'s Office Hours"

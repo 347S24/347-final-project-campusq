@@ -124,3 +124,47 @@ def active_office_hour_session(request):
     except Professor.DoesNotExist:
         return JsonResponse({'error': 'User is not a professor'}, status=403)
 
+
+from .models import User, Professor, Student, OfficeHourSession, Waitlist
+
+@api.post("/join_waitlist")
+def join_waitlist(request, session_code: str):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=403)
+    
+    try:
+        session = OfficeHourSession.objects.get(id=session_code.upper())
+        # Check if the student is already on the waitlist
+        if Waitlist.objects.filter(session=session, student=user.student).exists():
+            return JsonResponse({'error': 'Already on the waitlist'}, status=400)
+
+        Waitlist.objects.create(student=user.student, session=session)
+        # Here you would also send a WebSocket message to update all clients
+        return JsonResponse({'message': 'Added to waitlist', 'session_id': session.id}, status=200)
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({'error': 'Invalid session code'}, status=404)
+    
+@api.post("/invite_student")
+def invite_student(request):
+    user = request.user
+    if not user.is_authenticated or not hasattr(user, 'professor'):
+        return JsonResponse({'error': 'Unauthorized access'}, status=403)
+
+    try:
+        session = OfficeHourSession.objects.filter(professor=user.professor, is_active=True).first()
+        if not session:
+            return JsonResponse({'error': 'No active session found'}, status=404)
+
+        waitlist = Waitlist.objects.filter(session=session).order_by('joined_at')
+        if waitlist.exists():
+            first_student = waitlist.first()
+            waitlist.delete()  # Remove the student from the waitlist
+            # Logic to notify the student can be added here
+
+            return JsonResponse({'message': f'Student {first_student.student.user.name} invited', 'student': first_student.student.user.name}, status=200)
+        else:
+            return JsonResponse({'error': 'Waitlist is empty'}, status=404)
+    except Professor.DoesNotExist:
+        return JsonResponse({'error': 'Professor not found'}, status=404)
+
