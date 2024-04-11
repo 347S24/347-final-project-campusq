@@ -9,11 +9,6 @@ button {
   cursor: pointer;
 }
 
-#header {
-  display: flex;
-  justify-content: space-evenly;
-}
-
 input[type="text"],
 button {
   padding: 10px;
@@ -22,15 +17,6 @@ button {
   width: 200px;
   margin-bottom: 10px;
   box-sizing: border-box;
-}
-
-#body {
-  /* margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center; */
-  height: 80vh;
 }
 
 #title {
@@ -59,8 +45,8 @@ button {
     border: 2px solid #450084;
 }
 
-#login-button:hover {
-    background-color: #64269e; /* Change hover color */
+#button:hover {
+    background-color: #64269e;
 }
 
 #error-area {
@@ -69,8 +55,30 @@ button {
   align-items: center;
 }
 
+#body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
 #header {
   display: flex;
-  flex-direction:row;
+  justify-content: space-between;
   align-items: center;
+  width: 100%;
+  padding: 10px;
+}
+
+.top-left, .top-right {
+  flex: 1;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
 }
