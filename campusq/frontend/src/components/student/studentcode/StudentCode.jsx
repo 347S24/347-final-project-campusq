@@ -52,45 +52,41 @@ export default function StudentCode() {
     }
   };
 
-  if (redirect) {
-    return (
-      <Navigate
-        to="/student/questions"
-        state={{
-          code: code,
-          questions: questions,
-          professor: professor,
-        }}
-      />
-    );
-  }
-
-  // useEffect(() => {
-  //   const cookies = new Cookies();
-  //   const accessToken = cookies.get("access_token");
-  //   console.log("Access token:", accessToken);
-  //   const userDataURL = "http://127.0.0.1:8000/api/student/info";
-  //   const headers = {
-  //     Authorization: `Bearer ${accessToken}`,
-  //   };
-
-  //   fetch(userDataURL, {
-  //     method: "GET",
-  //     headers: headers,
-  //   })
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok");
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       console.log(data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("There was a problem with the fetch operation:", error);
-  //     });
-  // }, []);
+    const logout = async () => {
+    const cookies = new Cookies();
+    const accessToken = cookies.get("access_token");
+    
+    // Remove the access token from cookies
+    cookies.remove("access_token");
+    
+    try {
+      const response = await fetch('https://canvas.jmu.edu/login/oauth2/token', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+    
+      if (response.ok) {
+        const data = await response.json();
+        if (data.forward_url) {
+          // Redirect to the forward URL provided by Canvas
+          window.location.href = data.forward_url;
+        } else {
+          // If no forward_url is provided, manually redirect to Canvas's logout URL
+          window.location.href = 'https://canvas.jmu.edu/logout';
+        }
+      } else {
+        console.error('Failed to log out from Canvas');
+        // If the token revocation failed, still try to logout from Canvas directly
+        window.location.href = 'https://canvas.jmu.edu/logout';
+      }
+    } catch (error) {
+      console.error('Error logging out from Canvas:', error);
+      // On network error, still attempt to redirect to Canvas logout
+      window.location.href = 'https://canvas.jmu.edu/logout';
+    }
+  };
 
   useEffect(() => {
     const cookies = new Cookies();
@@ -119,14 +115,37 @@ export default function StudentCode() {
       });
   }, []);
 
+  if (redirect) {
+    return (
+      <Navigate
+        to="/student/questions"
+        state={{
+          code: code,
+          questions: questions,
+          professor: professor,
+        }}
+      />
+    );
+  }
+
+const handleLogout = () => {
+  const cookies = new Cookies();
+  cookies.remove("access_token");
+  window.location.href = "https://oxana.instructure.com/logout";
+};
+
   return (
-    <div id="wrapper">
-      <div>Logged in: {studentName}</div>
-      <button>logout</button>
-      <div className="main-container">
-        <div id="header">
+    <div id="body">
+      <div id="header">
+        <div id="top-left">
+          <div>Logged in: {studentName}</div>
+          <button onClick={logout}>logout</button>
+        </div>
+        <div id="middle">
           <h1 id="title">CampusQ</h1>
         </div>
+      </div>
+      <div className="main-container">
         <div id="button-part">
           <input
             id="input"
@@ -139,12 +158,12 @@ export default function StudentCode() {
           <button id="login-button" type="submit" onClick={handleSubmit}>
             Submit
           </button>
-          </div>
-          <div id="error-area">
-            {error && <div>{error}</div>}
-            {questions && <div>{questions}</div>}
-            {professor && <div>{professor}</div>}
-          </div>
+        </div>
+        <div id="error-area">
+          {error && <div>{error}</div>}
+          {questions && <div>{questions}</div>}
+          {professor && <div>{professor}</div>}
+        </div>
       </div>
     </div>
   );

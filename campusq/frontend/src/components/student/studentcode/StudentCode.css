@@ -19,14 +19,6 @@ button {
   box-sizing: border-box;
 }
 
-#wrapper {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 90vh;
-}
-
 #title {
   font-size: 90px;
   margin-bottom: 30px;
@@ -53,8 +45,8 @@ button {
     border: 2px solid #450084;
 }
 
-#login-button:hover {
-    background-color: #64269e; /* Change hover color */
+#button:hover {
+    background-color: #64269e;
 }
 
 #error-area {
@@ -63,8 +55,44 @@ button {
   align-items: center;
 }
 
-#header {
+#body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
+
+#header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.top-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-left button {
+  margin-top: 5px;
+}
+
+.top-left, #middle {
+  flex: 1;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  margin-bottom: auto;
+  text-align: center;
+}
+
+
+
