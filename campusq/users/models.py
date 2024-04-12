@@ -7,6 +7,13 @@ import random
 import string
 
 
+def generate_unique_code(num_chars=4):
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=num_chars))
+        while OfficeHourSession.objects.filter(id=code).exists():
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        return code
+
+
 class User(AbstractUser):
     """
     Default custom user model for Ultimate campusq.
@@ -18,6 +25,7 @@ class User(AbstractUser):
     name = CharField(_("Name of User"), blank=True, max_length=255)
     first_name = None  # type: ignore[assignment]
     last_name = None  # type: ignore[assignment]
+    canvas_id = models.CharField(max_length=100, null=True, blank=True)
 
     def get_absolute_url(self) -> str:
         """Get URL for user's detail view.
@@ -58,11 +66,7 @@ class OfficeHourSession(models.Model):
     def get_waitlist(self):
         return Waitlist.objects.filter(session=self).select_related('student')
 
-    def generate_unique_code():
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        while OfficeHourSession.objects.filter(id=code).exists():
-            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        return code
+    
 
     def set_questions(self, data):
         self.questions = ','.join(data)
@@ -75,7 +79,7 @@ class OfficeHourSession(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not self.id:
-            self.id = self.generate_unique_code()
+            self.id = generate_unique_code()
 
 class Waitlist(models.Model):
     student = models.ForeignKey('Student', on_delete=models.CASCADE)
@@ -87,3 +91,18 @@ class Waitlist(models.Model):
 
     def __str__(self):
         return f"{self.student.user.name} for {self.session.professor.user.name}'s Office Hours"
+
+
+class SessionToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    session_token = models.CharField(primary_key=True, max_length=32, unique=True)
+    access_token = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    refresh_token = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.session_token:
+            self.session_token = generate_unique_code(32)
+

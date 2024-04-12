@@ -1,6 +1,6 @@
 from ninja import NinjaAPI
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .models import User, Professor, Student, OfficeHourSession
+from .models import User, Professor, Student, OfficeHourSession, SessionToken
 import json
 import requests
 
@@ -16,13 +16,12 @@ def hello(request, name="world"):
 def get_user_by_name(request, name: str):
     try:
         user = User.objects.get(username=name)
-        # If you have a serializer for the User model, you can use it here
         return HttpResponse(user.name, status=200)
     except User.DoesNotExist:
         return HttpResponse("User not found", status=404)
     
 
-@api.post("/officehours")
+@api.post("/api/officehours")
 def join_office_hours(request):
     try:
         code = request.GET.get('code', '')
@@ -38,17 +37,53 @@ def join_office_hours(request):
 @api.get("/accounts/canvas/login/callback/")
 def canvas_login_callback(request):
     code = request.GET.get('code', None)
+    print("cookies:", request.COOKIES)
 
 
     absolute_uri = request.build_absolute_uri()
     get_token_url = "https://canvas.jmu.edu/login/oauth2/token?grant_type=authorization_code&client_id=190000000000938&client_secret=DUyraGNa3kmVHMK54NH1D4po5CF7XXSeyHeCE4ebaHTgeTCEnl0QTixPL569NUe9&redirect_uri=http://localhost:8000/accounts/canvas/login/callback/&code=" + code
     response = requests.post(get_token_url)
     data = response.json()
+    print("data:", data)
     access_token = data.get('access_token', None)
+    refresh_token = data.get('refresh_token', None)
+    canvas_id = data['user']['id']
+    user = None
+    userNameResponse= None
+    
+    if(User.objects.filter(canvas_id=canvas_id).exists()):
+        print("logged in returning user")
+        user = User.objects.get(canvas_id=canvas_id)
+        usernameResponse = User.username
+    else:
+        print("created and logged in new user")
+        usernameResponse = get_student_info(None, access_token)
+        print("responsessss:", userNameResponse)  
 
-    redirect_url = "http://localhost:8000/student/code"
+        
+        user = User.objects.create(canvas_id=canvas_id, name=data['user']['name'], username=response)
+        
+        Student.objects.create(user=user)
+
+
+        
+    print("Canvas ID:", canvas_id)
+    print("Access token:", access_token)
+    print("Refresh token:", refresh_token)
+    session_token = data.get('session_token', None)
+    
+    if session_token == None:
+        session_token_object = SessionToken.objects.create(user=user, access_token=access_token, refresh_token=refresh_token)
+        session_token = session_token_object.session_token
+
+
+    
+
+    redirect_url = f"http://localhost:8500/student/{usernameResponse}/code"
     redirect_response = HttpResponseRedirect(redirect_url)
-    redirect_response.set_cookie('access_token', access_token)
+    redirect_response.set_cookie('session_token', session_token)
+    redirect_response['UserName'] = user.username
+    
     return redirect_response
 
 
@@ -75,10 +110,10 @@ def canvas_login_callback(request):
 
 
 
-@api.get("/student/info")
+@api.get("/api/student/info")
 def get_student_info(request, access_token="error"):
 
-    print("Access token:", access_token)
+
     
 
     if access_token == "error":
@@ -95,14 +130,17 @@ def get_student_info(request, access_token="error"):
     apiResponse = requests.get("https://canvas.jmu.edu/api/v1/users/self/profile", headers=headers)
     data = apiResponse.json()
     login_id = data.get('login_id', None)
+
     response = JsonResponse({'login_id': login_id}, status=200)
     response["Access-Control-Allow-Origin"] = "*"
     response["Content-Type"] = "application/json"
-    print(data)
+    
     
 
     
-    return response
+    # return response
+    # return login_id
+    return data.get('primary_email', None)
 
 @api.get("/active_office_hour_session")
 def active_office_hour_session(request):
