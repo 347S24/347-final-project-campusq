@@ -6,6 +6,8 @@ import { Navigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { useEffect } from "react";
 
+import { useParams } from "react-router-dom";
+
 export default function StudentCode() {
   const [code, setCode] = useState("");
   const [questions, setQuestions] = useState("");
@@ -21,7 +23,7 @@ export default function StudentCode() {
         /*set this to your local ip/port accordingly */
       }
       const response = await fetch(
-        "http://127.0.0.1:8000/api/officehours?code=" + code,
+        "http://localhost:8000/api/officehours?code=" + code,
         {
           method: "POST",
           headers: {
@@ -52,21 +54,24 @@ export default function StudentCode() {
     }
   };
 
-    const logout = async () => {
+  const logout = async () => {
     const cookies = new Cookies();
     const accessToken = cookies.get("access_token");
-    
+
     // Remove the access token from cookies
     cookies.remove("access_token");
-    
+
     try {
-      const response = await fetch('https://canvas.jmu.edu/login/oauth2/token', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
+      const response = await fetch(
+        "https://canvas.jmu.edu/login/oauth2/token",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
-      });
-    
+      );
+
       if (response.ok) {
         const data = await response.json();
         if (data.forward_url) {
@@ -74,31 +79,31 @@ export default function StudentCode() {
           window.location.href = data.forward_url;
         } else {
           // If no forward_url is provided, manually redirect to Canvas's logout URL
-          window.location.href = 'https://canvas.jmu.edu/logout';
+          window.location.href = "https://canvas.jmu.edu/logout";
         }
       } else {
-        console.error('Failed to log out from Canvas');
+        console.error("Failed to log out from Canvas");
         // If the token revocation failed, still try to logout from Canvas directly
-        window.location.href = 'https://canvas.jmu.edu/logout';
+        window.location.href = "https://canvas.jmu.edu/logout";
       }
     } catch (error) {
-      console.error('Error logging out from Canvas:', error);
+      console.error("Error logging out from Canvas:", error);
       // On network error, still attempt to redirect to Canvas logout
-      window.location.href = 'https://canvas.jmu.edu/logout';
+      window.location.href = "https://canvas.jmu.edu/logout";
     }
   };
 
   useEffect(() => {
     const cookies = new Cookies();
-    const accessToken = cookies.get("access_token");
-    console.log("Access token:", accessToken);
-    const userDataURL =
-      "http://127.0.0.1:8000/api/student/info?access_token=" + accessToken;
+    const session_token = cookies.get("session_token");
+    console.log("all cookies:", cookies.getAll());
+    console.log("session_token:", session_token);
+    const userDataURL = "http://localhost:8000/api/student/info";
     const headers = {};
 
     fetch(userDataURL, {
       method: "GET",
-      headers: headers,
+      credentials: "include",
     })
       .then((response) => {
         if (!response.ok) {
@@ -128,11 +133,11 @@ export default function StudentCode() {
     );
   }
 
-const handleLogout = () => {
-  const cookies = new Cookies();
-  cookies.remove("access_token");
-  window.location.href = "https://oxana.instructure.com/logout";
-};
+  const handleLogout = () => {
+    const cookies = new Cookies();
+    cookies.remove("access_token");
+    window.location.href = "https://oxana.instructure.com/logout";
+  };
 
   return (
     <div id="body">
