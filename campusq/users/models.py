@@ -51,10 +51,13 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     major = models.CharField(max_length=100)
     year = models.CharField(max_length=100)
-    session = models.ForeignKey('OfficeHourSession', on_delete=models.CASCADE, null=True, blank=True)
+    waitlist = models.ForeignKey('Waitlist', on_delete=models.CASCADE, null=True, blank=True)
+
     def __str__(self):
         return self.user.name
 
+
+# work in progress below
 class OfficeHourSession(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
     start_time = models.DateTimeField(auto_now_add=True)
@@ -67,6 +70,12 @@ class OfficeHourSession(models.Model):
         return Waitlist.objects.filter(session=self).select_related('student')
 
     
+    def update_waitlist_positions(self):
+        waitlist_entries = Waitlist.objects.filter(session=self).order_by('joined_at')
+        for index, entry in enumerate(waitlist_entries, start=1):
+            entry.position = index
+            entry.save()
+
 
     def set_questions(self, data):
         self.questions = ','.join(data)
@@ -82,15 +91,15 @@ class OfficeHourSession(models.Model):
             self.id = generate_unique_code()
 
 class Waitlist(models.Model):
-    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    
     session = models.ForeignKey('OfficeHourSession', on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['joined_at']  # Ensures the waitlist is ordered by join time
+        ordering = ['joined_at']
 
     def __str__(self):
-        return f"{self.student.user.name} for {self.session.professor.user.name}'s Office Hours"
+        return f"{self.session.professor.user.name}'s Office Hours session"
 
 
 class SessionToken(models.Model):
@@ -106,3 +115,21 @@ class SessionToken(models.Model):
         if not self.session_token:
             self.session_token = generate_unique_code(32)
 
+
+class SessionQuestion(models.Model):
+    session = models.ForeignKey('OfficeHourSession', on_delete=models.CASCADE)
+    question = models.CharField(max_length=1000)
+    
+
+    def __str__(self):
+        return f"Question by {self.student.user.name} for {self.session.professor.user.name}"
+    
+
+class SessionResponse(models.Model):
+    question = models.ForeignKey('SessionQuestion', on_delete=models.CASCADE)
+    response = models.CharField(max_length=1000)
+    answered_at = models.DateTimeField(auto_now_add=True)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Response to {self.question} by {self.student.user.name}"

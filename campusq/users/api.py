@@ -1,6 +1,6 @@
 from ninja import NinjaAPI, Cookie
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .models import User, Professor, Student, OfficeHourSession, SessionToken
+from .models import User, Professor, Student, OfficeHourSession, SessionToken, Waitlist
 import json
 import requests
 
@@ -140,7 +140,7 @@ def get_student_info(request):
     }
 
     apiResponse = requests.get("https://canvas.jmu.edu/api/v1/users/self/profile", headers=headers)
-    # refresh token flow, ugly but works, details: https://canvas.instructure.com/doc/api/file.oauth.html#using-refresh-tokens
+    # refresh token flow details: https://canvas.instructure.com/doc/api/file.oauth.html#using-refresh-tokens
     if apiResponse.status_code != 200:
         refreshResponse = requests.post("https://canvas.jmu.edu/login/oauth2/token?grant_type=refresh_token&client_id=190000000000938&client_secret=DUyraGNa3kmVHMK54NH1D4po5CF7XXSeyHeCE4ebaHTgeTCEnl0QTixPL569NUe9&refresh_token=" + session_token_object.refresh_token)
         
@@ -189,7 +189,6 @@ def active_office_hour_session(request):
         return JsonResponse({'error': 'User is not a professor'}, status=403)
 
 
-from .models import User, Professor, Student, OfficeHourSession, Waitlist
 
 @api.post("/join_waitlist")
 def join_waitlist(request, session_code: str):
@@ -232,3 +231,10 @@ def invite_student(request):
     except Professor.DoesNotExist:
         return JsonResponse({'error': 'Professor not found'}, status=404)
 
+
+@api.get("/waitcode")
+def show_waitlist(request, waitcode="none"):
+    members = OfficeHourSession.objects.get(id=waitcode.upper()).get_waitlist()
+    
+
+    return JsonResponse({"message": "Waitlist page"})
