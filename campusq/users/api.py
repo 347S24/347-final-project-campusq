@@ -128,22 +128,20 @@ def active_office_hour_session(request):
 from .models import User, Professor, Student, OfficeHourSession, Waitlist
 
 @api.post("/join_waitlist")
-def join_waitlist(request, session_code: str):
-    user = request.user
-    if not user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=403)
-    
+def join_waitlist(request):
+    code = request.POST.get('code')
     try:
-        session = OfficeHourSession.objects.get(id=session_code.upper())
-        # Check if the student is already on the waitlist
-        if Waitlist.objects.filter(session=session, student=user.student).exists():
+        session = OfficeHourSession.objects.get(id=code)
+        student = Student.objects.get(user=request.user)
+        if Waitlist.objects.filter(session=session, student=student).exists():
             return JsonResponse({'error': 'Already on the waitlist'}, status=400)
-
-        Waitlist.objects.create(student=user.student, session=session)
-        # Here you would also send a WebSocket message to update all clients
+        Waitlist.objects.create(student=student, session=session)
         return JsonResponse({'message': 'Added to waitlist', 'session_id': session.id}, status=200)
     except OfficeHourSession.DoesNotExist:
         return JsonResponse({'error': 'Invalid session code'}, status=404)
+    except Student.DoesNotExist:
+        return JsonResponse({'error': 'Student not found'}, status=403)
+
     
 @api.post("/invite_student")
 def invite_student(request):
@@ -168,3 +166,29 @@ def invite_student(request):
     except Professor.DoesNotExist:
         return JsonResponse({'error': 'Professor not found'}, status=404)
 
+@api.get("/waitlist_details")
+def get_waitlist_details(request, session_code: str):
+    try:
+        session = OfficeHourSession.objects.get(id=session_code.upper())
+        waitlist = Waitlist.objects.filter(session=session).order_by('joined_at')
+        user_position = next((index for index, wl in enumerate(waitlist, start=1) if wl.student.user == request.user), None)
+        return JsonResponse({
+            'total': waitlist.count(),
+            'position': user_position,
+            'students': list(waitlist.values_list('student__user__username', flat=True))
+        }, status=200)
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({'error': 'Session not found'}, status=404)
+
+from django.http import JsonResponse
+from .models import OfficeHourSession, Professor
+
+@api.post("/create_session")
+def create_session(request):
+    try:
+        professor = Professor.objects.get(user=request.user)
+        session = OfficeHourSession(professor=professor)
+        session.save()
+        return JsonResponse({'code': session.id}, status=200)
+    except Professor.DoesNotExist:
+        return JsonResponse({'error': 'Professor not found'}, status=403)
