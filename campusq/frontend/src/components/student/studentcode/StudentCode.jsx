@@ -17,15 +17,13 @@ export default function StudentCode() {
 
   const [redirect, setRedirect] = useState(false);
 
-  const { user } = useParams();
-
   const handleSubmit = async () => {
     try {
       {
         /*set this to your local ip/port accordingly */
       }
       const response = await fetch(
-        "http://127.0.0.1:8000/api/officehours?code=" + code,
+        "http://localhost:8000/api/officehours?code=" + code,
         {
           method: "POST",
           headers: {
@@ -97,15 +95,15 @@ export default function StudentCode() {
 
   useEffect(() => {
     const cookies = new Cookies();
-    const accessToken = cookies.get("access_token");
-    console.log("Access token:", accessToken);
-    const userDataURL =
-      "http://127.0.0.1:8000/api/student/info?access_token=" + accessToken;
+    const session_token = cookies.get("session_token");
+    console.log("all cookies:", cookies.getAll());
+    console.log("session_token:", session_token);
+    const userDataURL = "http://localhost:8000/api/student/info";
     const headers = {};
 
     fetch(userDataURL, {
       method: "GET",
-      headers: headers,
+      credentials: "include",
     })
       .then((response) => {
         if (!response.ok) {
@@ -145,7 +143,7 @@ export default function StudentCode() {
     <div id="body">
       <div id="header">
         <div id="top-left">
-          <div>Logged in: {user}</div>
+          <div>Logged in: {studentName}</div>
           <button onClick={logout}>logout</button>
         </div>
         <div id="middle">

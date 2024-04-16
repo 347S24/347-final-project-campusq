@@ -19,3 +19,7 @@ django-redis==5.4.0  # https://github.com/jazzband/django-redis
 # ------------------------------------------------------------------------------
 django-ninja
 django-allauth[mfa] @ git+https://github.com/347S24/django-allauth.git
+
+# Cors
+#-------------------------------------------------------------------------------
+django-cors-headers==4.0.0

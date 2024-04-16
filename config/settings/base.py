@@ -84,12 +84,20 @@ THIRD_PARTY_APPS = [
     "allauth.mfa",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.canvas",
+    "corsheaders"
 ]
 
 LOCAL_APPS = [
     "campusq.users",
     # Your stuff: custom apps go here
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8500",  # Frontend URL
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -147,6 +155,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "corsheaders.middleware.CorsMiddleware"
 ]
 
 # STATIC

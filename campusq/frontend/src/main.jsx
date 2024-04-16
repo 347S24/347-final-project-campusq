@@ -20,7 +20,7 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "/student/:user/code",
+    path: "/student/code",
     element: <StudentCode />,
   },
   {

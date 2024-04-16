@@ -1,4 +1,4 @@
-from ninja import NinjaAPI
+from ninja import NinjaAPI, Cookie
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from .models import User, Professor, Student, OfficeHourSession, SessionToken
 import json
@@ -37,7 +37,8 @@ def join_office_hours(request):
 @api.get("/accounts/canvas/login/callback/")
 def canvas_login_callback(request):
     code = request.GET.get('code', None)
-    print("cookies:", request.COOKIES)
+    print("cookies???:", request.COOKIES)
+    print("request url:", request.build_absolute_uri())
 
 
     absolute_uri = request.build_absolute_uri()
@@ -73,16 +74,21 @@ def canvas_login_callback(request):
     session_token = data.get('session_token', None)
     
     if session_token == None:
+        print("created new session token")
         session_token_object = SessionToken.objects.create(user=user, access_token=access_token, refresh_token=refresh_token)
         session_token = session_token_object.session_token
 
 
     
 
-    redirect_url = f"http://localhost:8500/student/{usernameResponse}/code"
+    redirect_url = f"http://localhost:8500/student/code"
     redirect_response = HttpResponseRedirect(redirect_url)
-    redirect_response.set_cookie('session_token', session_token)
-    redirect_response['UserName'] = user.username
+    
+    redirect_response.set_cookie('session_token', session_token, samesite="Lax", domain="localhost", path="/")
+
+    print("Response Headers:")
+    for h, value in redirect_response.items():
+        print(f"{h}: {value}")
     
     return redirect_response
 
@@ -111,15 +117,21 @@ def canvas_login_callback(request):
 
 
 @api.get("/api/student/info")
-def get_student_info(request, access_token="error"):
+def get_student_info(request):
+    print("request:", request)
+    print("cookies lol:", request.COOKIES)
 
-
+    session_token = request.COOKIES.get('session_token', None)
+    
+    
     
 
-    if access_token == "error":
+    if session_token == None:
+        print("No cookies")
         return JsonResponse({"error": "No access token provided"}, status=400)
     
-    
+    session_token_object = SessionToken.objects.get(session_token=session_token)
+    access_token = session_token_object.access_token
     
     headers = {
     "Authorization": f"Bearer {access_token}",
@@ -128,19 +140,33 @@ def get_student_info(request, access_token="error"):
     }
 
     apiResponse = requests.get("https://canvas.jmu.edu/api/v1/users/self/profile", headers=headers)
+    # refresh token flow, ugly but works, details: https://canvas.instructure.com/doc/api/file.oauth.html#using-refresh-tokens
+    if apiResponse.status_code != 200:
+        refreshResponse = requests.post("https://canvas.jmu.edu/login/oauth2/token?grant_type=refresh_token&client_id=190000000000938&client_secret=DUyraGNa3kmVHMK54NH1D4po5CF7XXSeyHeCE4ebaHTgeTCEnl0QTixPL569NUe9&refresh_token=" + session_token_object.refresh_token)
+        
+        data = refreshResponse.json()
+        access_token = data.get('access_token', None)
+        session_token_object.access_token = access_token
+        session_token_object.save()
+        headers["Authorization"] = f"Bearer {access_token}"
+        print("refreshed token")
+        apiResponse = requests.get("https://canvas.jmu.edu/api/v1/users/self/profile", headers=headers)
+
+
+        
+    
+    
     data = apiResponse.json()
     login_id = data.get('login_id', None)
 
     response = JsonResponse({'login_id': login_id}, status=200)
-    response["Access-Control-Allow-Origin"] = "*"
     response["Content-Type"] = "application/json"
+    response["Access-Control-Allow-Origin"] = "http://localhost:8500"
     
     
 
     
-    # return response
-    # return login_id
-    return data.get('primary_email', None)
+    return response
 
 @api.get("/active_office_hour_session")
 def active_office_hour_session(request):
