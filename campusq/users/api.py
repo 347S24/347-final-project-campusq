@@ -57,12 +57,23 @@ def canvas_login_callback(request):
         user = User.objects.get(canvas_id=canvas_id)
         usernameResponse = User.username
     else:
+        headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "plain/text",
+        "Access-Control-Allow-Origin": "*"
+        }   
+        newUserResponse = requests.get("https://canvas.jmu.edu/api/v1/users/self/profile", headers=headers)
+        newUserData = newUserResponse.json()
+        print("new user thing data:", newUserData)
+        login_id = newUserData.get('login_id', None)
+        print("login id::::", login_id)
+
         print("created and logged in new user")
-        usernameResponse = get_student_info(None, access_token)
-        print("responsessss:", userNameResponse)  
+        
+        
 
         
-        user = User.objects.create(canvas_id=canvas_id, name=data['user']['name'], username=response)
+        user = User.objects.create(canvas_id=canvas_id, name=newUserData.get('name', None), username=login_id)
         
         Student.objects.create(user=user)
 
