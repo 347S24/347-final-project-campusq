@@ -9,7 +9,6 @@ import Wait from "./components/instructor/waitroom/wait.jsx"; // Ensure this pat
 import StudentQuestions from "./components/student/studentquestions/StudentQuestions.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import TempWaitlist from "./tempwaitlist.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,10 +38,6 @@ const router = createBrowserRouter([
   {
     path: "/instructor/waitroom",
     element: <Wait />,
-  },
-  {
-    path: "tempwaitlist/:waitcode",
-    element: <TempWaitlist />,
   },
 ]);
 
