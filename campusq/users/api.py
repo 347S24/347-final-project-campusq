@@ -1,8 +1,16 @@
 from ninja import NinjaAPI, Cookie
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .models import User, Professor, Student, OfficeHourSession, SessionToken, Waitlist
+from .models import User, Professor, Student, OfficeHourSession, SessionToken, Waitlist, SessionQuestion, SessionResponse
 import json
 import requests
+from collections import OrderedDict
+
+##IMPORTANT: these routes have no prefix in the main urls file, so if you want 
+##your route at /api/myroute, you have to declare it as such,
+##not just as /myroute
+
+##this is to account for the /account/canvas/login/callback route
+##that we are forced to use
 
 
 api = NinjaAPI()
@@ -20,19 +28,91 @@ def get_user_by_name(request, name: str):
     except User.DoesNotExist:
         return HttpResponse("User not found", status=404)
     
+@api.get("/api/officehoursession")
+def get_office_hour_session(request, code="none"):
+    headers = {
+        "Access-Control-Allow-Origin": "http://localhost:8500",
+    }
+    print("tttttt")
+    code = request.GET.get('code', '')
+    print("code:", code)
+    try:
+        session = OfficeHourSession.objects.get(id=code.upper())
+        waitlist = Waitlist.objects.get(session=session)
+        
+        questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
+        students = Student.objects.filter(waitlist=waitlist).order_by('position')
+        studentsDict = OrderedDict()
+        for student in students:
+            responses = SessionResponse.objects.filter(student=student)
+            answer = []
+            for response in responses:
+                answer.append(response.response)
+            studentsDict[student.user.name] = answer
+            
+        serlializedStudents = students_list = [{"student_name": student_name, "responses": responses} for student_name, responses in studentsDict.items()]
+        response = JsonResponse({
+            "questions": [q.question for q in questions],
+            "answers": studentsDict
+            }, status=200, headers=headers)
+        return response
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({"error": "Invalid code"}, status=404, headers=headers)
+    
 
-@api.post("/api/officehours")
+@api.get("/api/officehoursquestions")
 def join_office_hours(request):
     try:
         code = request.GET.get('code', '')
         session = OfficeHourSession.objects.get(id=code.upper())
-        response = JsonResponse({"questions": session.questions,
-                                 "instructor": session.professor.user.name}, status=200)
+        
+        questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
+        response = JsonResponse({"questions": [q.question for q in questions]}, status=200)
         response["Access-Control-Allow-Origin"] = "*"
         response["Content-Type"] = "application/json"
         return response
     except OfficeHourSession.DoesNotExist:
         return JsonResponse({"error": "Invalid code"}, status=404)
+    
+
+@api.post("/api/officehoursquestions/submit")
+def submit_question(request):
+    canvas_id = request.COOKIES.get('canvas_id', None)
+    data = json.loads(request.body.decode('utf-8'))
+
+    responseHeaders = {
+        "Access-Control-Allow-Origin": "http://localhost:8500",
+    }
+    
+
+    
+    answers = data.get('answers')
+    code = data.get('code')
+    officehours = OfficeHourSession.objects.get(id=code.upper())
+    officeHourQuestions = SessionQuestion.objects.filter(session=officehours)
+    student = Student.objects.get(user=User.objects.get(canvas_id=canvas_id))
+    waitlist = Waitlist.objects.get(session=officehours)
+    print("waitlist:", waitlist)
+    if student.waitlist != waitlist:
+        if SessionResponse.objects.filter(student=student).exists():
+            SessionResponse.objects.filter(student=student).delete()
+        for i in range(len(officeHourQuestions)):
+            SessionResponse.objects.create(question=officeHourQuestions[i], response=answers[i], student=Student.objects.get(user=User.objects.get(canvas_id=canvas_id)))
+        student.waitlist = waitlist
+        numStudentsInWaitlList = len(Student.objects.filter(waitlist=waitlist))
+        student.position = numStudentsInWaitlList+1
+
+        
+        student.save()
+        print("office hour questions:", officeHourQuestions)
+        reponse = JsonResponse({"message": "Question submitted"}, status=200, headers=responseHeaders)
+    else:
+        reponse = JsonResponse({"message": "student already in waitlist"}, status=400, headers=responseHeaders)
+    print("responselul:", reponse)
+    return reponse
+
+
+
     
 @api.get("/accounts/canvas/login/callback/")
 def canvas_login_callback(request):
@@ -96,6 +176,7 @@ def canvas_login_callback(request):
     redirect_response = HttpResponseRedirect(redirect_url)
     
     redirect_response.set_cookie('session_token', session_token, samesite="Lax", domain="localhost", path="/")
+    redirect_response.set_cookie('canvas_id', canvas_id, samesite="Lax", domain="localhost", path="/")
 
     print("Response Headers:")
     for h, value in redirect_response.items():
@@ -249,3 +330,4 @@ def show_waitlist(request, waitcode="none"):
     
 
     return JsonResponse({"message": "Waitlist page"})
+

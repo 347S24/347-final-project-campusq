@@ -52,6 +52,7 @@ class Student(models.Model):
     major = models.CharField(max_length=100)
     year = models.CharField(max_length=100)
     waitlist = models.ForeignKey('Waitlist', on_delete=models.CASCADE, null=True, blank=True)
+    position = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.user.name
@@ -94,6 +95,7 @@ class Waitlist(models.Model):
     
     session = models.ForeignKey('OfficeHourSession', on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
+    professor = models.ForeignKey('Professor', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         ordering = ['joined_at']
@@ -119,10 +121,14 @@ class SessionToken(models.Model):
 class SessionQuestion(models.Model):
     session = models.ForeignKey('OfficeHourSession', on_delete=models.CASCADE)
     question = models.CharField(max_length=1000)
+    professor = models.ForeignKey('Professor', on_delete=models.CASCADE, null=True, blank=True)
+    waitlist = models.ForeignKey('Waitlist', on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)  
+
     
 
     def __str__(self):
-        return f"Question by {self.student.user.name} for {self.session.professor.user.name}"
+        return f"{self.question}"
     
 
 class SessionResponse(models.Model):
@@ -130,6 +136,7 @@ class SessionResponse(models.Model):
     response = models.CharField(max_length=1000)
     answered_at = models.DateTimeField(auto_now_add=True)
     student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True) 
 
     def __str__(self):
         return f"Response to {self.question} by {self.student.user.name}"

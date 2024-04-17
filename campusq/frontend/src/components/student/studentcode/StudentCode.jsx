@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 
 export default function StudentCode() {
   const [code, setCode] = useState("");
-  const [questions, setQuestions] = useState("");
+  const [questions, setQuestions] = useState([]);
   const [error, setError] = useState("");
   const [professor, setProfessor] = useState("");
   const [studentName, setStudentName] = useState("");
@@ -23,9 +23,9 @@ export default function StudentCode() {
         /*set this to your local ip/port accordingly */
       }
       const response = await fetch(
-        "http://localhost:8000/api/officehours?code=" + code,
+        "http://localhost:8000/api/officehoursquestions?code=" + code,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "text/plain",
           },
@@ -34,6 +34,7 @@ export default function StudentCode() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("response data for questions:", data);
         setQuestions(data.questions);
         setError("");
         setProfessor(data.instructor);
