@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from .models import User, Professor, Student, OfficeHourSession, SessionToken, Waitlist, SessionQuestion, SessionResponse
 import json
 import requests
+from collections import OrderedDict
 
 ##IMPORTANT: these routes have no prefix in the main urls file, so if you want 
 ##your route at /api/myroute, you have to declare it as such,
@@ -38,12 +39,21 @@ def get_office_hour_session(request, code="none"):
     try:
         session = OfficeHourSession.objects.get(id=code.upper())
         waitlist = Waitlist.objects.get(session=session)
+        
         questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
-        answers = [[a.response for a in SessionResponse.objects.filter(question=q)] for q in questions]
-
+        students = Student.objects.filter(waitlist=waitlist).order_by('position')
+        studentsDict = OrderedDict()
+        for student in students:
+            responses = SessionResponse.objects.filter(student=student)
+            answer = []
+            for response in responses:
+                answer.append(response.response)
+            studentsDict[student.user.name] = answer
+            
+        serlializedStudents = students_list = [{"student_name": student_name, "responses": responses} for student_name, responses in studentsDict.items()]
         response = JsonResponse({
             "questions": [q.question for q in questions],
-            "answers": answers
+            "answers": studentsDict
             }, status=200, headers=headers)
         return response
     except OfficeHourSession.DoesNotExist:
@@ -84,9 +94,15 @@ def submit_question(request):
     waitlist = Waitlist.objects.get(session=officehours)
     print("waitlist:", waitlist)
     if student.waitlist != waitlist:
+        if SessionResponse.objects.filter(student=student).exists():
+            SessionResponse.objects.filter(student=student).delete()
         for i in range(len(officeHourQuestions)):
             SessionResponse.objects.create(question=officeHourQuestions[i], response=answers[i], student=Student.objects.get(user=User.objects.get(canvas_id=canvas_id)))
         student.waitlist = waitlist
+        numStudentsInWaitlList = len(Student.objects.filter(waitlist=waitlist))
+        student.position = numStudentsInWaitlList+1
+
+        
         student.save()
         print("office hour questions:", officeHourQuestions)
         reponse = JsonResponse({"message": "Question submitted"}, status=200, headers=responseHeaders)
@@ -94,20 +110,8 @@ def submit_question(request):
         reponse = JsonResponse({"message": "student already in waitlist"}, status=400, headers=responseHeaders)
     print("responselul:", reponse)
     return reponse
-    print("canvas id:", canvas_id)
-    print("answers:", answers)
-    print("code:", code)
-    user = User.objects.get(canvas_id=canvas_id)
-    if not user:
-        return HttpResponse("User not found", status=404)
 
-    response = HttpResponse("Question submitted", status=200)
-    
-    
-    
 
-    
-    return response
 
     
 @api.get("/accounts/canvas/login/callback/")
