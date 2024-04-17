@@ -1,8 +1,15 @@
 from ninja import NinjaAPI, Cookie
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .models import User, Professor, Student, OfficeHourSession, SessionToken, Waitlist
+from .models import User, Professor, Student, OfficeHourSession, SessionToken, Waitlist, SessionQuestion, SessionResponse
 import json
 import requests
+
+##IMPORTANT: these routes have no prefix in the main urls file, so if you want 
+##your route at /api/myroute, you have to declare it as such,
+##not just as /myroute
+
+##this is to account for the /account/canvas/login/callback route
+##that we are forced to use
 
 
 api = NinjaAPI()
@@ -20,19 +27,88 @@ def get_user_by_name(request, name: str):
     except User.DoesNotExist:
         return HttpResponse("User not found", status=404)
     
+@api.get("/api/officehoursession")
+def get_office_hour_session(request, code="none"):
+    headers = {
+        "Access-Control-Allow-Origin": "http://localhost:8500",
+    }
+    print("tttttt")
+    code = request.GET.get('code', '')
+    print("code:", code)
+    try:
+        session = OfficeHourSession.objects.get(id=code.upper())
+        waitlist = Waitlist.objects.get(session=session)
+        questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
+        answers = [[a.response for a in SessionResponse.objects.filter(question=q)] for q in questions]
 
-@api.post("/api/officehours")
+        response = JsonResponse({
+            "questions": [q.question for q in questions],
+            "answers": answers
+            }, status=200, headers=headers)
+        return response
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({"error": "Invalid code"}, status=404, headers=headers)
+    
+
+@api.get("/api/officehoursquestions")
 def join_office_hours(request):
     try:
         code = request.GET.get('code', '')
         session = OfficeHourSession.objects.get(id=code.upper())
-        response = JsonResponse({"questions": session.questions,
-                                 "instructor": session.professor.user.name}, status=200)
+        
+        questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
+        response = JsonResponse({"questions": [q.question for q in questions]}, status=200)
         response["Access-Control-Allow-Origin"] = "*"
         response["Content-Type"] = "application/json"
         return response
     except OfficeHourSession.DoesNotExist:
         return JsonResponse({"error": "Invalid code"}, status=404)
+    
+
+@api.post("/api/officehoursquestions/submit")
+def submit_question(request):
+    canvas_id = request.COOKIES.get('canvas_id', None)
+    data = json.loads(request.body.decode('utf-8'))
+
+    responseHeaders = {
+        "Access-Control-Allow-Origin": "http://localhost:8500",
+    }
+    
+
+    
+    answers = data.get('answers')
+    code = data.get('code')
+    officehours = OfficeHourSession.objects.get(id=code.upper())
+    officeHourQuestions = SessionQuestion.objects.filter(session=officehours)
+    student = Student.objects.get(user=User.objects.get(canvas_id=canvas_id))
+    waitlist = Waitlist.objects.get(session=officehours)
+    print("waitlist:", waitlist)
+    if student.waitlist != waitlist:
+        for i in range(len(officeHourQuestions)):
+            SessionResponse.objects.create(question=officeHourQuestions[i], response=answers[i], student=Student.objects.get(user=User.objects.get(canvas_id=canvas_id)))
+        student.waitlist = waitlist
+        student.save()
+        print("office hour questions:", officeHourQuestions)
+        reponse = JsonResponse({"message": "Question submitted"}, status=200, headers=responseHeaders)
+    else:
+        reponse = JsonResponse({"message": "student already in waitlist"}, status=400, headers=responseHeaders)
+    print("responselul:", reponse)
+    return reponse
+    print("canvas id:", canvas_id)
+    print("answers:", answers)
+    print("code:", code)
+    user = User.objects.get(canvas_id=canvas_id)
+    if not user:
+        return HttpResponse("User not found", status=404)
+
+    response = HttpResponse("Question submitted", status=200)
+    
+    
+    
+
+    
+    return response
+
     
 @api.get("/accounts/canvas/login/callback/")
 def canvas_login_callback(request):
@@ -96,6 +172,7 @@ def canvas_login_callback(request):
     redirect_response = HttpResponseRedirect(redirect_url)
     
     redirect_response.set_cookie('session_token', session_token, samesite="Lax", domain="localhost", path="/")
+    redirect_response.set_cookie('canvas_id', canvas_id, samesite="Lax", domain="localhost", path="/")
 
     print("Response Headers:")
     for h, value in redirect_response.items():
@@ -249,3 +326,4 @@ def show_waitlist(request, waitcode="none"):
     
 
     return JsonResponse({"message": "Waitlist page"})
+

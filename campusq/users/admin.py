@@ -57,8 +57,8 @@ class OfficeHourSessionAdmin(admin.ModelAdmin):
     
 @admin.register(Waitlist)
 class WaitlistAdmin(admin.ModelAdmin):
-    list_display = ['student', 'session', 'joined_at']
-    search_fields = ['student__user__name', 'session__id']
+    list_display = [ 'session', 'joined_at']
+    search_fields = [ 'session__id']
     readonly_fields = ['joined_at']
 
 @admin.register(SessionToken)
@@ -72,3 +72,8 @@ class SessionQuestionAdmin(admin.ModelAdmin):
     list_display = ['question', 'session']
     search_fields = ['session__id', 'question']
     
+
+@admin.register(SessionResponse)
+class SessionResponseAdmin(admin.ModelAdmin):
+    list_display = ['response', 'question', 'student']
+    search_fields = ['question__session__id', 'response', 'user__name']
