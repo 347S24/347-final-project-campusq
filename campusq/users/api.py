@@ -33,8 +33,15 @@ def get_user_by_name(request, name: str):
 def leave_waitlist(request):
     canvas_id = request.COOKIES.get('canvas_id', None)
     student = Student.objects.get(user=User.objects.get(canvas_id=canvas_id))
+    print("stydent:", student)
+    print("stydent waitlist before:", student.waitlist)
+
     student.waitlist = None
-    return JsonResponse({"message": "Left waitlist"}, status=200)
+    
+    student.save()
+    print("student:", student.waitlist)
+    
+    return JsonResponse({"message": "Left waitlist"}, headers={"Access-Control-Allow-Origin": "http://localhost:8500"}, status=200)
     
 @api.get("/api/officehoursession")
 def get_office_hour_session(request, code="none"):
@@ -109,15 +116,18 @@ def submit_question(request):
         student.waitlist = waitlist
         numStudentsInWaitlist = len(Student.objects.filter(waitlist=waitlist))
         student.position = numStudentsInWaitlist+1
+
         
 
         
         student.save()
         print("office hour questions:", officeHourQuestions)
         reponse = JsonResponse({"message": "Question submitted",
-                                "position": "{student.position}",
-                                "totalInQ": "{numStudentsInWaitlist}"}, status=200, headers=responseHeaders)
+                                "position": f"{student.position}",
+                                "totalInQ": f"{numStudentsInWaitlist+1}"}, status=200, headers=responseHeaders)
     else:
+        print("studentttttt:", student.waitlist)
+        print(student.user.username)
         reponse = JsonResponse({"message": "student already in waitlist"}, status=400, headers=responseHeaders)
     print("responselul:", reponse)
     return reponse
