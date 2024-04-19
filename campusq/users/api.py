@@ -28,6 +28,14 @@ def get_user_by_name(request, name: str):
     except User.DoesNotExist:
         return HttpResponse("User not found", status=404)
     
+
+@api.post("/api/leave_waitlist")
+def leave_waitlist(request):
+    canvas_id = request.COOKIES.get('canvas_id', None)
+    student = Student.objects.get(user=User.objects.get(canvas_id=canvas_id))
+    student.waitlist = None
+    return JsonResponse({"message": "Left waitlist"}, status=200)
+    
 @api.get("/api/officehoursession")
 def get_office_hour_session(request, code="none"):
     headers = {
@@ -99,13 +107,16 @@ def submit_question(request):
         for i in range(len(officeHourQuestions)):
             SessionResponse.objects.create(question=officeHourQuestions[i], response=answers[i], student=Student.objects.get(user=User.objects.get(canvas_id=canvas_id)))
         student.waitlist = waitlist
-        numStudentsInWaitlList = len(Student.objects.filter(waitlist=waitlist))
-        student.position = numStudentsInWaitlList+1
+        numStudentsInWaitlist = len(Student.objects.filter(waitlist=waitlist))
+        student.position = numStudentsInWaitlist+1
+        
 
         
         student.save()
         print("office hour questions:", officeHourQuestions)
-        reponse = JsonResponse({"message": "Question submitted"}, status=200, headers=responseHeaders)
+        reponse = JsonResponse({"message": "Question submitted",
+                                "position": "{student.position}",
+                                "totalInQ": "{numStudentsInWaitlist}"}, status=200, headers=responseHeaders)
     else:
         reponse = JsonResponse({"message": "student already in waitlist"}, status=400, headers=responseHeaders)
     print("responselul:", reponse)
