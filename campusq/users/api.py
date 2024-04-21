@@ -42,15 +42,68 @@ def leave_waitlist(request):
     print("student:", student.waitlist)
     
     return JsonResponse({"message": "Left waitlist"}, headers={"Access-Control-Allow-Origin": "http://localhost:8500"}, status=200)
+
+@api.get("/api/instructor/info")
+def get_instructor_info(request):
+
+
+    session_token = request.COOKIES.get('session_token', None)
+    headers = {
+        "Access-Control-Allow-Origin": "http://localhost:8500",
+    }
+    if session_token == None:
+        print("No cookies")
+        return JsonResponse({"error": "No access token provided"}, status=400, headers=headers)
+    try:
+        
+        user = SessionToken.objects.get(session_token=session_token).user
+        print("user:", user)
+
+        proffesor = Professor.objects.get(user=user)
+        session = OfficeHourSession.objects.get(professor=proffesor)
+        waitlist = Waitlist.objects.get(session=session)
+
+        if session == None:
+            session = OfficeHourSession.objects.create(professor=proffesor)
+        print("sesh:", session.id)
+
+
+        questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
+        students = Student.objects.filter(waitlist=waitlist).order_by('position')
+        studentsDict = OrderedDict()
+        for student in students:
+            responses = SessionResponse.objects.filter(student=student)
+            answer = []
+            for response in responses:
+                answer.append(response.response)
+            studentsDict[student.user.name] = answer
+        response = JsonResponse({"name": user.name, "sessioncode": session.id,
+                                 "questions": [q.question for q in questions],
+                                 "answers": studentsDict}, status=200, headers=headers)
+        print("uhhh")
+        print("session id:", session.id)
+
+        
+        
+    except SessionToken.DoesNotExist:
+        return JsonResponse({"error": "Invalid session token"}, status=400, headers=headers)
+    except Professor.DoesNotExist:
+        return JsonResponse({"error": "Invalid professor"}, status=400, headers=headers)
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({"error": "Invalid session"}, status=400, headers=headers)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "Invalid user"}, status=400, headers=headers)
+    return response
+
     
-@api.get("/api/officehoursession")
-def get_office_hour_session(request, code="none"):
+@api.get("/api/officehoursession/{code}")
+def get_office_hour_session(request, code: str):
     headers = {
         "Access-Control-Allow-Origin": "http://localhost:8500",
     }
     print("tttttt")
-    code = request.GET.get('code', '')
     print("code:", code)
+
     try:
         session = OfficeHourSession.objects.get(id=code.upper())
         waitlist = Waitlist.objects.get(session=session)
@@ -138,6 +191,8 @@ def submit_question(request):
 @api.get("/accounts/canvas/login/callback/")
 def canvas_login_callback(request):
     code = request.GET.get('code', None)
+    state = request.GET.get('state', None)
+    
     print("cookies???:", request.COOKIES)
     print("request url:", request.build_absolute_uri())
 
@@ -162,9 +217,10 @@ def canvas_login_callback(request):
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "plain/text",
         "Access-Control-Allow-Origin": "*"
-        }   
+        }
         newUserResponse = requests.get("https://canvas.jmu.edu/api/v1/users/self/profile", headers=headers)
         newUserData = newUserResponse.json()
+
         print("new user thing data:", newUserData)
         login_id = newUserData.get('login_id', None)
         print("login id::::", login_id)
@@ -176,7 +232,12 @@ def canvas_login_callback(request):
         
         user = User.objects.create(canvas_id=canvas_id, name=newUserData.get('name', None), username=login_id)
         
-        Student.objects.create(user=user)
+        student = Student.objects.create(user=user)
+        professor = Professor.objects.create(user=user)
+        office = OfficeHourSession.objects.create(professor=professor)
+        waitlist = Waitlist.objects.create(session=office)
+
+
 
 
         
@@ -192,41 +253,16 @@ def canvas_login_callback(request):
 
 
     
-
-    redirect_url = f"http://localhost:8500/student/code"
+    if state == "student":
+        redirect_url = f"http://localhost:8500/student/code"
+    else:
+        redirect_url = f"http://localhost:8500/instructor"
     redirect_response = HttpResponseRedirect(redirect_url)
     
     redirect_response.set_cookie('session_token', session_token, samesite="Lax", domain="localhost", path="/")
     redirect_response.set_cookie('canvas_id', canvas_id, samesite="Lax", domain="localhost", path="/")
-
-    print("Response Headers:")
-    for h, value in redirect_response.items():
-        print(f"{h}: {value}")
     
     return redirect_response
-
-
-
-    return HttpResponse(response.text, status=200)
-
-# @api.get("/student/info")
-# def get_student_info(request):
-#     access_token = request.headers.get('access-token', None)
-#     if access_token is None:
-#         return JsonResponse({"error": "No access token provided"}, status=400)
-    
-    
-#     print("Access token:", access_token)
-#     headers = {
-#     "Authorization": f"Bearer {access_token}",
-#     "Content-Type": "plain/text",
-#     "Access-Control-Allow-Origin": "*"
-#     }
-#     response = requests.get("https://canvas.jmu.edu/api/v1/users/self", headers=headers)
-#     data = response.json()
-#     print("data: " + data)
-#     return JsonResponse(data, status=200)
-
 
 
 @api.get("/api/student/info")
@@ -281,46 +317,7 @@ def get_student_info(request):
     
     return response
 
-@api.get("/active_office_hour_session")
-def active_office_hour_session(request):
-    user = request.user
-    if not user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=403)
 
-    try:
-        professor = Professor.objects.get(user=user)
-        session = OfficeHourSession.objects.filter(professor=professor, is_active=True).first()
-        if session:
-            return JsonResponse({
-                'session_id': session.id,
-                'start_time': session.start_time.isoformat(),
-                'end_time': session.end_time.isoformat() if session.end_time else None,
-                'is_active': session.is_active,
-                'questions': session.questions.split(',')
-            })
-    except Professor.DoesNotExist:
-        return JsonResponse({'error': 'User is not a professor'}, status=403)
-
-
-
-@api.post("/join_waitlist")
-def join_waitlist(request, session_code: str):
-    user = request.user
-    if not user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=403)
-    
-    try:
-        session = OfficeHourSession.objects.get(id=session_code.upper())
-        # Check if the student is already on the waitlist
-        if Waitlist.objects.filter(session=session, student=user.student).exists():
-            return JsonResponse({'error': 'Already on the waitlist'}, status=400)
-
-        Waitlist.objects.create(student=user.student, session=session)
-        # Here you would also send a WebSocket message to update all clients
-        return JsonResponse({'message': 'Added to waitlist', 'session_id': session.id}, status=200)
-    except OfficeHourSession.DoesNotExist:
-        return JsonResponse({'error': 'Invalid session code'}, status=404)
-    
 @api.post("/invite_student")
 def invite_student(request):
     user = request.user

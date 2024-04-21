@@ -7,6 +7,7 @@ import Instructor from "./components/instructor/Instructor.jsx";
 import EditQuestions from "./components/instructor/editquestions/EditQuestions.jsx";
 import WaitRoom from "./components/instructor/waitroom/WaitRoom.jsx"; // Ensure this path is correct
 import StudentQuestions from "./components/student/studentquestions/StudentQuestions.jsx";
+import Dashboard from "./components/instructor/dashboard/Dashboard.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import TestView from "./TestView.jsx";

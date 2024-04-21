@@ -53,6 +53,7 @@ class Student(models.Model):
     year = models.CharField(max_length=100)
     waitlist = models.ForeignKey('Waitlist', on_delete=models.CASCADE, null=True, blank=True)
     position = models.IntegerField(null=True, blank=True)
+    
 
     def __str__(self):
         return self.user.name
@@ -60,7 +61,7 @@ class Student(models.Model):
 
 # work in progress below
 class OfficeHourSession(models.Model):
-    professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
+    professor = models.OneToOneField(Professor, on_delete=models.CASCADE)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
