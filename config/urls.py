@@ -13,10 +13,8 @@ from .views import HomeView
 
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="index.html"), name="home"),
-    # path("", api.urls),
-    
-    path('api/', api.urls ),
+    # path("", TemplateView.as_view(template_name="index.html"), name="home"),
+    path("", api.urls),
     
     path(
         "about/",
@@ -26,8 +24,8 @@ urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
-    path("users/", include("campusq.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
+    # path("users/", include("campusq.users.urls", namespace="users")),
+    # path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
     
     re_path(".*", HomeView.as_view(), name="home"),

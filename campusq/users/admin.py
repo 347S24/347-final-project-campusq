@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import User, Professor, Student, OfficeHourSession
+from .models import User, Professor, Student, OfficeHourSession, Waitlist, SessionToken, SessionQuestion, SessionResponse
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     # Force the `admin` sign in process to go through the `django-allauth` workflow:
@@ -55,3 +55,25 @@ class OfficeHourSessionAdmin(admin.ModelAdmin):
     search_fields = ['professor__user__name']
     readonly_fields = ['id']
     
+@admin.register(Waitlist)
+class WaitlistAdmin(admin.ModelAdmin):
+    list_display = [ 'session', 'joined_at']
+    search_fields = [ 'session__id']
+    readonly_fields = ['joined_at']
+
+@admin.register(SessionToken)
+class SessionTokenAdmin(admin.ModelAdmin):
+    list_display = ['access_token', 'session_token', 'user']
+    search_fields = ['access_token', 'refresh_token']
+
+
+@admin.register(SessionQuestion)
+class SessionQuestionAdmin(admin.ModelAdmin):
+    list_display = ['question', 'session']
+    search_fields = ['session__id', 'question']
+    
+
+@admin.register(SessionResponse)
+class SessionResponseAdmin(admin.ModelAdmin):
+    list_display = ['response', 'question', 'student']
+    search_fields = ['question__session__id', 'response', 'user__name']
