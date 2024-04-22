@@ -329,3 +329,61 @@ def show_waitlist(request, waitcode="none"):
 
     return JsonResponse({"message": "Waitlist page"})
 
+# Backend Points where prof creates, student joins, prof or student view it, prof takes student
+# api: queue/ create
+@api.post("/api/queue/create")
+def create_queue(request, session_id: int):
+    if not request.user.is_authenticated or not hasattr(request.user, 'professor'):
+        return JsonResponse({'error': 'Unauthorized access'}, status=403)
+    
+    try:
+        session = OfficeHourSession.objects.get(id=session_id, professor=request.user.professor, is_active=True)
+        Queue.objects.create(session=session, professor=request.user.professor)
+        return JsonResponse({'message': 'Queue created for session', 'session_id': session_id}, status=200)
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({'error': 'Session not found or not active'}, status=404)
+
+# api: queue/ :qid/ join
+    # if student dont show names in the queue
+    #else if teacher show names in the queue
+@api.post("/api/queue/{queue_id}/join")
+def join_queue(request, queue_id: int):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized access'}, status=403)
+    
+    try:
+        queue = Queue.objects.get(id=queue_id)
+        if hasattr(request.user, 'student'):
+            # Prevent student from seeing names in the queue
+            if QueueEnrollment.objects.filter(queue=queue, student=request.user.student).exists():
+                return JsonResponse({'error': 'Already joined the queue'}, status=400)
+
+            # Add student to queue
+            last_index = QueueEnrollment.objects.filter(queue=queue).count()
+            QueueEnrollment.objects.create(queue=queue, student=request.user.student, index=last_index + 1)
+            return JsonResponse({'message': 'Joined the queue'}, status=200)
+        elif hasattr(request.user, 'professor'):
+            # Show all names for professors
+            members = QueueEnrollment.objects.filter(queue=queue).order_by('index')
+            names_list = [{'student_name': member.student.user.name, 'index': member.index} for member in members]
+            return JsonResponse({'queue_members': names_list}, status=200)
+    except Queue.DoesNotExist:
+        return JsonResponse({'error': 'Queue not found'}, status=404)
+
+# api: queue/ :qid/ remove
+@api.post("/api/queue/{queue_id}/remove")
+def remove_student_from_queue(request, queue_id: int):
+    if not request.user.is_authenticated or not hasattr(request.user, 'professor'):
+        return JsonResponse({'error': 'Unauthorized access'}, status=403)
+
+    try:
+        queue = Queue.objects.get(id=queue_id, professor=request.user.professor)
+        waitlist = QueueEnrollment.objects.filter(queue=queue).order_by('index').first()
+        if waitlist:
+            student_name = waitlist.student.user.name
+            waitlist.delete()
+            return JsonResponse({'message': f'Student {student_name} removed from queue'}, status=200)
+        else:
+            return JsonResponse({'error': 'Queue is empty'}, status=404)
+    except Queue.DoesNotExist:
+        return JsonResponse({'error': 'Queue not found or does not belong to this professor'}, status=404)

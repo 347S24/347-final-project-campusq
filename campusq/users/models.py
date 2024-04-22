@@ -129,7 +129,7 @@ class SessionQuestion(models.Model):
 
     def __str__(self):
         return f"{self.question}"
-    
+
 
 class SessionResponse(models.Model):
     question = models.ForeignKey('SessionQuestion', on_delete=models.CASCADE)
@@ -140,3 +140,43 @@ class SessionResponse(models.Model):
 
     def __str__(self):
         return f"Response to {self.question} by {self.student.user.name}"
+    
+    # queue model
+    # many to many between student and office hour session
+    # FIELD TYPE DJANGO MANY TO MANY
+    # creator: FK (prof or class session)
+    # student: many to many field (to user, through=QueueEnrollment)
+    class Queue(models.Model):
+        session = models.ForeignKey('OfficeHourSession', on_delete=models.CASCADE)
+        professor = models.ForeignKey('Professor', on_delete=models.CASCADE)
+        created_at = models.DateTimeField(auto_now_add=True)
+
+        def __str__(self):
+            return f"{self.session} Queue started by {self.professor.user.name}"
+
+
+    # queueEnrollment
+    # queue: FK (to queue)
+    # student: FK (to user)
+    # created_at to sort the queue
+    # dequeie_at 
+    # index to sort the queue
+    class QueueEnrollment(models.Model):
+        queue = models.ForeignKey('Queue', on_delete=models.CASCADE)
+        student = models.ForeignKey('Student', on_delete=models.CASCADE)
+        joined_at = models.DateTimeField(auto_now_add=True)
+        dequeued_at = models.DateTimeField(null=True, blank=True)
+        index = models.IntegerField()
+
+        class Meta:
+            ordering = ['joined_at']
+
+        def __str__(self):
+            return f"{self.student.user.name} enrollment in {self.queue}"
+
+    #1. professor starts office hours
+        # backend creates a queue instance
+    #2. student joins queue
+        # backend creates a queueEnrollment instance
+    #3. another student joins queue
+        # backend creates a queueEnrollment instance
