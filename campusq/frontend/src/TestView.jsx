@@ -1,37 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-export default function TestView() {
-  const { code } = useParams();
-
-  const [questions, setQuestions] = useState([]);
-  const [answers, setAnswers] = useState({});
-
-  const getInfo = async () => {
-    const response = await fetch(
-      "http://localhost:8000/api/officehoursession?code=" + code,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "text/plain",
-        },
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("response data for questions:", data);
-      setQuestions(data.questions);
-      setAnswers(data.answers);
-      console.log("ansers", answers);
-    } else {
-      console.error("Failed to get questions oops");
-    }
-  };
-
-  useEffect(() => {
-    getInfo();
-  }, []);
+export default function TestView({ questions, answers, code }) {
+  console.log("testviewcode", code);
+  console.log("testviewquestions", questions);
+  console.log("testviewanswers", answers);
 
   return (
     <div className="main-container">

@@ -14,6 +14,9 @@ export default function StudentCode() {
   const [error, setError] = useState("");
   const [professor, setProfessor] = useState("");
   const [studentName, setStudentName] = useState("");
+  setTimeout(() => {
+    console.log("code:", code);
+  }, 1000);
 
   const [redirect, setRedirect] = useState(false);
 
