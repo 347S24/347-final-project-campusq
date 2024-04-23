@@ -53,6 +53,8 @@ class Student(models.Model):
     year = models.CharField(max_length=100)
     waitlist = models.ForeignKey('Waitlist', on_delete=models.CASCADE, null=True, blank=True)
     position = models.IntegerField(null=True, blank=True)
+    joined_at = models.DateTimeField(null=True, blank=True)
+    
     
 
     def __str__(self):

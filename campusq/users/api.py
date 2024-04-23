@@ -4,6 +4,7 @@ from .models import User, Professor, Student, OfficeHourSession, SessionToken, W
 import json
 import requests
 from collections import OrderedDict
+from django.utils import timezone
 
 ##IMPORTANT: these routes have no prefix in the main urls file, so if you want 
 ##your route at /api/myroute, you have to declare it as such,
@@ -14,6 +15,14 @@ from collections import OrderedDict
 
 
 api = NinjaAPI()
+
+
+def update_waitlist_positions(waitlist):
+    students = Student.objects.filter(waitlist=waitlist).order_by('joined_at')
+    for i in range(len(students)):
+        students[i].position = i+1
+        students[i].save()
+    return 0
 
 @api.get("/hello")
 def hello(request, name="world"):
@@ -29,15 +38,30 @@ def get_user_by_name(request, name: str):
         return HttpResponse("User not found", status=404)
     
 
+
+@api.get("/api/student_waitlist_info")
+def get_student_waitlist_info(request):
+    canvas_id = request.COOKIES.get('canvas_id', None)
+    student = Student.objects.get(user=User.objects.get(canvas_id=canvas_id))
+    print("student:", student)
+    print("student waitlist:", student.waitlist)
+    numStudentsInWaitlist = len(Student.objects.filter(waitlist=student.waitlist))
+    position = student.position
+    return JsonResponse({"position": f"{position}", "totalInQ": f"{numStudentsInWaitlist}"}, headers={"Access-Control-Allow-Origin": "http://localhost:8500"}, status=200)
+
+    
+
 @api.post("/api/leave_waitlist")
 def leave_waitlist(request):
     canvas_id = request.COOKIES.get('canvas_id', None)
     student = Student.objects.get(user=User.objects.get(canvas_id=canvas_id))
+
     print("stydent:", student)
     print("stydent waitlist before:", student.waitlist)
-
-    student.waitlist = None
     
+    waitlist = student.waitlist
+    student.waitlist = None
+    update_waitlist_positions(waitlist)
     student.save()
     print("student:", student.waitlist)
     
@@ -160,6 +184,7 @@ def submit_question(request):
     officeHourQuestions = SessionQuestion.objects.filter(session=officehours)
     student = Student.objects.get(user=User.objects.get(canvas_id=canvas_id))
     waitlist = Waitlist.objects.get(session=officehours)
+    student.joined_at = timezone.now()
     print("waitlist:", waitlist)
     if student.waitlist != waitlist:
         if SessionResponse.objects.filter(student=student).exists():
@@ -181,6 +206,7 @@ def submit_question(request):
     else:
         print("studentttttt:", student.waitlist)
         print(student.user.username)
+        print('student already in waitlist')
         reponse = JsonResponse({"message": "student already in waitlist"}, status=400, headers=responseHeaders)
     print("responselul:", reponse)
     return reponse

@@ -51,10 +51,8 @@ import "./wait.css";
 export default function WaitRoom() {
   const location = useLocation();
   console.log("location state:", location.state);
-  const [totalStudents, setTotalStudents] = useState(location.state.total || 0);
-  const [yourPosition, setYourPosition] = useState(
-    location.state.position || 0
-  );
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [yourPosition, setYourPosition] = useState(0);
   const [isInLine, setIsInLine] = useState(false);
   const [redirect, setRedirect] = useState(false);
 
@@ -76,6 +74,31 @@ export default function WaitRoom() {
       setRedirect(true);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Fetching student waitlist info");
+      const response = await fetch(
+        "http://localhost:8000/api/student_waitlist_info",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        console.log("Successfully fetched student waitlist info");
+        const jsonData = await response.json();
+        setTotalStudents(jsonData.totalInQ);
+        setYourPosition(jsonData.position);
+        setIsInLine(true);
+        console.log("jsondata:", jsonData);
+      }
+    };
+    fetchData();
+  }, []);
 
   if (redirect) {
     return <Navigate to="/student/code" />;
