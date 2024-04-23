@@ -89,6 +89,7 @@ def get_instructor_info(request):
 
         if session == None:
             session = OfficeHourSession.objects.create(professor=proffesor)
+            waitlist = Waitlist.objects.create(session=session)
         print("sesh:", session.id)
 
 
