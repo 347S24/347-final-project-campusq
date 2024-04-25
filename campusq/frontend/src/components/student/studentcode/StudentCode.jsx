@@ -110,12 +110,6 @@ const logout = async () => {
     );
   }
 
-  const handleLogout = () => {
-    const cookies = new Cookies();
-    cookies.remove("access_token");
-    window.location.href = "https://oxana.instructure.com/logout";
-  };
-
   return (
     <div id="body">
       <div id="header">
