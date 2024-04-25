@@ -58,49 +58,17 @@ export default function StudentCode() {
     }
   };
 
-  const logout = async () => {
+const logout = async () => {
     const cookies = new Cookies();
-    const accessToken = cookies.get("access_token");
+    cookies.remove("access_token", { path: '/' });
+    cookies.remove("session_token", { path: '/' });
 
-    // Remove the access token from cookies
-    cookies.remove("access_token");
-    // cookies.remove("session_token"); // Get rid of session_token 
+    console.log('Logged out');
 
-    // try {
-    //   const response = await fetch(
-    //     "https://canvas.jmu.edu/login/oauth2/token",
-    //     {
-    //       method: "DELETE",
-    //       headers: {
-    //         Authorization: `Bearer ${accessToken}`,
-    //       },
-    //     }
-    //   );
+    window.location = '/login';
+};
 
-    //   if (response.ok) {
-    //     const data = await response.json();
-    //     if (data.forward_url) {
-    //       // Redirect to the forward URL provided by Canvas
-    //       window.location.href = data.forward_url;
-    //     } else {
-    //       // If no forward_url is provided, manually redirect to Canvas's logout URL
-    //       window.location.href = "https://canvas.jmu.edu/logout";
-    //     }
-    //   } else {
-    //     console.error("Failed to log out from Canvas");
-    //     // If the token revocation failed, still try to logout from Canvas directly
-    //     window.location.href = "https://canvas.jmu.edu/logout";
-    //   }
-    // } catch (error) {
-    //   console.error("Error logging out from Canvas:", error);
-    //   // On network error, still attempt to redirect to Canvas logout
-    //   // window.location.href = "https://canvas.jmu.edu/logout";
-    // }
 
-    console.log('get out')
-
-    window.location = '/'
-  };
 
   useEffect(() => {
     const cookies = new Cookies();
