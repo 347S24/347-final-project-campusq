@@ -164,6 +164,8 @@ def join_office_hours(request):
     try:
         code = request.GET.get('code', '')
         session = OfficeHourSession.objects.get(id=code.upper())
+        if session.is_active == False:
+            return JsonResponse({"error": "Session is not active"}, status=401, headers=headers)
         
         questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
         response = JsonResponse({"questions": [q.question for q in questions]}, status=200, headers=headers)
