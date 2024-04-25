@@ -14,6 +14,7 @@ export default function StudentCode() {
   const [error, setError] = useState("");
   const [professor, setProfessor] = useState("");
   const [studentName, setStudentName] = useState("");
+  const [validSession, setValidSession] = useState(true);
   setTimeout(() => {
     console.log("code:", code);
   }, 1000);
@@ -46,6 +47,8 @@ export default function StudentCode() {
       } else if (response.status == 404) {
         setQuestions("");
         setError("Invalid code");
+      } else if (response.status == 401) {
+        setValidSession(false);
       } else {
         const errorResponse = await response.text();
         setQuestions("");
@@ -172,6 +175,7 @@ export default function StudentCode() {
           {error && <div>{error}</div>}
           {questions && <div>{questions}</div>}
           {professor && <div>{professor}</div>}
+          {!validSession && <div>Session is not active</div>}
         </div>
       </div>
     </div>
