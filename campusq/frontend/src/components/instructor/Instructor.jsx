@@ -9,6 +9,7 @@ export default function Instructor() {
   const [data, setData] = useState({});
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
+  const [sessionStatus, setSessionStatus] = useState(false);
 
   const [code, setCode] = useState("1234");
 
@@ -44,6 +45,7 @@ export default function Instructor() {
       setCode(jsonData.sessioncode);
       setQuestions(jsonData.questions);
       setAnswers(jsonData.answers);
+      setSessionStatus(jsonData.sessionStatus);
     } else {
       console.error("Failed to fetch instructor info");
     }
@@ -53,6 +55,39 @@ export default function Instructor() {
     init();
   }, []);
 
+  const activateSession = async () => {
+    const response = await fetch("http://localhost:8000/api/activate_session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      console.log("Successfully activated session");
+      setSessionStatus(true);
+    }
+  };
+
+  const endSession = async () => {
+    const response = await fetch(
+      "http://localhost:8000/api/deactivate_session",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        credentials: "include",
+      }
+    );
+
+    if (response.ok) {
+      console.log("Successfully ended session");
+      setSessionStatus(false);
+    }
+  };
+
   console.log("data", data);
   console.log("sessioncode", data.sessioncode);
 
@@ -60,9 +95,24 @@ export default function Instructor() {
     <div style={{}}>
       <button onClick={addStudent}>Add Student</button>
       <button onClick={inviteStudent}>Invite Student</button>
-      <Link to={"/instructor/edit"}>
-        <button>Edit questions</button>
-      </Link>
+      <button onClick={activateSession}>Activate Session</button>
+      <button onClick={endSession}>End Session</button>
+      {sessionStatus ? (
+        <div>
+          deactivate session to edit questions. This will remove all students
+          from queue
+        </div>
+      ) : (
+        <Link to={"/instructor/edit"}>
+          <button>Edit questions</button>
+        </Link>
+      )}
+
+      {sessionStatus ? (
+        <h1 style={{ color: "green" }}>Session is active</h1>
+      ) : (
+        <h1 style={{ color: "red" }}>Session is not active</h1>
+      )}
 
       <TestView
         code={data.sessioncode}

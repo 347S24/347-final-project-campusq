@@ -80,7 +80,6 @@ class OfficeHourSession(models.Model):
             entry.position = index
             entry.save()
 
-
     def set_questions(self, data):
         self.questions = ','.join(data)
     def get_questions(self):

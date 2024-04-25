@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 import "./EditQuestions.css";
 import { Link } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { set } from "mongoose";
 
 const QuestionBar = ({ id, deleteQuestion, question, updateQuestion }) => {
   return (
@@ -9,6 +11,7 @@ const QuestionBar = ({ id, deleteQuestion, question, updateQuestion }) => {
       <textarea
         className="question-input"
         type="text"
+        defaultValue={question}
         placeholder="Enter Question"
         onChange={(e) => updateQuestion(id, e.target.value)}
       />
@@ -32,6 +35,7 @@ export default function EditQuestions() {
   }
 
   const [questions, setQuestions] = useState({});
+  const [redirect, setRedirect] = useState(false);
 
   const addQuestion = () => {
     const id = uuid();
@@ -61,9 +65,79 @@ export default function EditQuestions() {
     }));
   };
 
-  const save = () => {
-    console.log(questions);
+  const save = async () => {
+    const keys = Object.keys(questions);
+    let values = [];
+    for (let i = 0; i < keys.length; i++) {
+      values.push(questions[keys[i]].question);
+    }
+    console.log("questions:", values);
+
+    const response = await fetch(
+      "http://localhost:8000/api/instructor_questions/save",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          questions: values,
+        }),
+      }
+    );
+
+    if (response.ok) {
+      console.log("Successfully saved questions");
+      setRedirect(true);
+    }
   };
+
+  const init = async () => {
+    const response = await fetch(
+      "http://localhost:8000/api/instructor_questions",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        credentials: "include",
+      }
+    );
+
+    if (response.ok) {
+      console.log("Successfully fetched questions");
+      const jsonData = await response.json();
+      console.log("jsonData:", jsonData);
+      console.log("jsonData[questions]:", jsonData.questions);
+      const data = jsonData.questions;
+      console.log("data:", data);
+
+      setQuestions(() => {
+        let newQuestions = {};
+        let id = 0;
+        for (let i = 0; i < data.length; i++) {
+          id = uuid();
+          newQuestions[id] = { id: id, question: data[i] };
+        }
+        console.log("newQuestions:", newQuestions);
+        return newQuestions;
+      });
+      console.log("questions:", questions);
+    } else {
+      console.error("Failed to fetch questions");
+    }
+  };
+
+  useEffect(() => {
+    init();
+    console.log("qiestions");
+    console.log(questions);
+  }, []);
+
+  if (redirect) {
+    return <Navigate to="/instructor" />;
+  }
 
   return (
     <div className="">
@@ -85,7 +159,7 @@ export default function EditQuestions() {
             key={question.id}
             id={question.id}
             deleteQuestion={deleteQuestion}
-            question={question}
+            question={question.question}
             updateQuestion={updateQuestion}
           />
         ))}

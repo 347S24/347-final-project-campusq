@@ -104,7 +104,8 @@ def get_instructor_info(request):
             studentsDict[student.user.name] = answer
         response = JsonResponse({"name": user.name, "sessioncode": session.id,
                                  "questions": [q.question for q in questions],
-                                 "answers": studentsDict}, status=200, headers=headers)
+                                 "answers": studentsDict,
+                                 "sessionStatus": session.is_active}, status=200, headers=headers)
         print("uhhh")
         print("session id:", session.id)
 
@@ -155,17 +156,20 @@ def get_office_hour_session(request, code: str):
 
 @api.get("/api/officehoursquestions")
 def join_office_hours(request):
+    print("attempting to get questions")
+    headers = {
+        "Access-Control-Allow-Origin": "http://localhost:8500",
+
+    }
     try:
         code = request.GET.get('code', '')
         session = OfficeHourSession.objects.get(id=code.upper())
         
         questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
-        response = JsonResponse({"questions": [q.question for q in questions]}, status=200)
-        response["Access-Control-Allow-Origin"] = "*"
-        response["Content-Type"] = "application/json"
+        response = JsonResponse({"questions": [q.question for q in questions]}, status=200, headers=headers)
         return response
     except OfficeHourSession.DoesNotExist:
-        return JsonResponse({"error": "Invalid code"}, status=404)
+        return JsonResponse({"error": "Invalid code"}, status=404, headers=headers)
     
 
 @api.post("/api/officehoursquestions/submit")
@@ -376,3 +380,92 @@ def show_waitlist(request, waitcode="none"):
 
     return JsonResponse({"message": "Waitlist page"})
 
+
+@api.post("/api/deactivate_session")
+def deactivate_session(request):
+    headers = {
+            "Access-Control-Allow-Origin": "http://localhost:8500",
+        }
+    [print("cookie:", cookie) for cookie in request.COOKIES.items()]
+    
+    try:
+        token = request.COOKIES.get('session_token', None)
+        print("token:", token)
+        print("session token:", SessionToken)
+        
+        user = SessionToken.objects.get(session_token=token).user
+        print("user:", user)
+        professor = Professor.objects.get(user=user)
+        session = OfficeHourSession.objects.get(professor=professor)
+        session.is_active = False
+        session.save()
+        return JsonResponse({"message": "Session deactivated"}, status=200, headers=headers)
+    except SessionToken.DoesNotExist:
+        print("no session token")
+        return JsonResponse({"error": "Invalid session token"}, status=400, headers=headers)
+    
+@api.post("/api/activate_session")
+def activate_session(request):
+    headers = {
+            "Access-Control-Allow-Origin": "http://localhost:8500",
+        }
+    [print("cookie:", cookie) for cookie in request.COOKIES.items()]
+    
+    try:
+        token = request.COOKIES.get('session_token', None)
+        print("token:", token)
+        print("session token:", SessionToken)
+        
+        user = SessionToken.objects.get(session_token=token).user
+        print("user:", user)
+        professor = Professor.objects.get(user=user)
+        session = OfficeHourSession.objects.get(professor=professor)
+        session.is_active = True
+        session.save()
+        return JsonResponse({"message": "Session activated"}, status=200, headers=headers)
+    except SessionToken.DoesNotExist:
+        print("no session token")
+        return JsonResponse({"error": "Invalid session token"}, status=400, headers=headers)
+    
+
+@api.get("/api/instructor_questions")
+def get_proffesor_questions(request):
+    
+    
+    headers = {
+            "Access-Control-Allow-Origin": "http://localhost:8500",
+        }
+    
+    
+    try:
+        token = request.COOKIES.get('session_token', None)
+        user = SessionToken.objects.get(session_token=token).user
+        session = OfficeHourSession.objects.get(professor=Professor.objects.get(user=user))
+        questions = SessionQuestion.objects.filter(session=session).order_by('created_at')
+        response = JsonResponse({"questions": [q.question for q in questions]}, status=200, headers=headers)
+        return response
+        
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({"error": "Invalid code"}, status=404, headers=headers)
+
+
+
+@api.post("/api/instructor_questions/save")
+def save_proffesor_questions(request):
+    headers = {
+            "Access-Control-Allow-Origin": "http://localhost:8500",
+        }
+    data = json.loads(request.body.decode('utf-8'))
+    print("data:", data)
+    try:
+        token = request.COOKIES.get('session_token', None)
+        user = SessionToken.objects.get(session_token=token).user
+        session = OfficeHourSession.objects.get(professor=Professor.objects.get(user=user))
+        questions = data.get('questions')
+        SessionQuestion.objects.filter(session=session).delete()
+        
+        for question in questions:
+            SessionQuestion.objects.create(session=session, question=question)
+        return JsonResponse({"message": "Questions saved"}, status=200, headers=headers)
+    except OfficeHourSession.DoesNotExist:
+        return JsonResponse({"error": "Invalid code"}, status=404, headers=headers)
