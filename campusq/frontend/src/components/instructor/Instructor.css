@@ -1,4 +1,4 @@
-.wrapper {
+/* .wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6,15 +6,65 @@
   height: 100vh;
   background-color: white;
   
+} */
+
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Center content vertically within the viewport */
+  height: 100vh;
+  background-color: #DACCE6; /* Light purple background for a soft appearance */
 }
 
-/* button {
+button {
   color: white;
-  background-color: #450084;
-  font-size: 15px;
-  margin-left: 20px;
-  margin-right: 20px;
-  border-radius: 5px;
+  background-color: #450084; /* JMU Purple */
+  font-size: 1em; /* Responsive font size */
+  padding: 0.5em 1em; /* Padding for better button shape */
+  margin: 0.5em; /* Space between buttons */
+  border-radius: 0.3em;
   border: none;
   cursor: pointer;
-} */
+  transition: background-color 0.3s ease, transform 0.2s; /* Smooth transition for hover effect */
+}
+
+button:hover {
+  background-color: #B599CE; /* Medium purple for hover */
+  transform: scale(1.05); /* Slightly enlarge button on hover */
+}
+
+button:active {
+  transform: scale(0.95); /* Slight shrink effect when clicked */
+}
+
+/* Style for links that look like buttons */
+a button {
+  background-color: #CBB677; /* JMU Gold */
+  color: #333333; /* Slate gray text for better readability */
+}
+
+a button:hover {
+  background-color: #AD9C65; /* Dark gold for hover */
+}
+
+/* Additional style adjustments for other elements if needed */
+.test-view {
+  border: 2px solid #450084; /* Border for the test view component */
+  padding: 1em; /* Padding around the content */
+  margin-top: 2em; /* Space above the test view component */
+  width: 80%; /* Controlled width for better layout */
+  background-color: #F4EFE1; /* Light gold background */
+}
+
+/* Ensuring all text has enough contrast and is easy to read */
+body, h1, p {
+  color: #333333; /* Slate gray for general text for better readability */
+}
+
+h1 {
+  margin-bottom: 0.5em; /* Space below headers */
+  color: #450084; /* Use JMU Purple for headings */
+}
+
