@@ -147,14 +147,14 @@ export default function StudentCode() {
     <div id="body">
       <div id="header">
         <div id="top-left">
-          <div>Logged in: {studentName}</div>
+          <div id ="user-info">Logged in: {studentName}</div>
           <button onClick={logout}>logout</button>
-        </div>
-        <div id="middle">
-          <h1 id="title">CampusQ</h1>
         </div>
       </div>
       <div className="main-container">
+      <div id="middle">
+        <h1 id="title">CampusQ</h1>
+      </div>
         <div id="button-part">
           <input
             id="input"
