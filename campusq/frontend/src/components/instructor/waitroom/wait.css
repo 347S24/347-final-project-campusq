@@ -1,18 +1,76 @@
-#progressBarContainer 
-{
-    width: 100%;
+
+
+#progressBarContainer {
+    width: 90%;
     background-color: #ddd;
-    padding: 3px;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    padding: 0.1875em; /* Adjusted padding */
+    border-radius: 0.3125em;
+    box-shadow: 0 0 0.3125em rgba(0,0,0,0.2);
+    margin: 1.25em auto;
+    position: relative; /* Needed for positioning text absolute to this container */
 }
-#progressBar 
-{
-    height: 20px;
-    background-color: #4CAF50;
+
+#progressBar {
+    height: 1.25em; /* Height of the progress bar */
+    background-color: #c3a0ff; /* A visually appealing color */
     width: 0%; /* Initial width */
-    border-radius: 3px;
+    border-radius: 0.3125em;
     text-align: center;
-    line-height: 20px;
+    line-height: 1.25em; /* Center the text vertically */
     color: white;
+    position: relative; /* Allows text positioning relative to bar */
+    overflow: hidden; /* Hide overflow to maintain rounded corners */
+}
+/* Ensuring text visibility even on low fill rates */
+#progressBar::after {
+    content: attr(aria-valuenow) ' of ' attr(aria-valuemax); /* Using aria attributes for dynamic text */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white;
+    line-height: 1.25em;
+}
+
+.wait-container {
+    text-align: center;
+    padding: 2em; /* Using em for padding */
+    background: #f4f4f9;
+    margin: 1em auto;
+    border-radius: 0.5em;
+    box-shadow: 0 0.25em 0.375em rgba(0,0,0,0.1);
+    width: 95%; /* Use most of the viewport width */
+    height: auto; /* Height auto for content-based sizing */
+    min-height: 80vh; /* Minimum height to cover most of the viewport height */
+    display: flex; /* Flex display to enable inner content alignment */
+    flex-direction: column; /* Stack children vertically */
+    justify-content: center; /* Center children vertically */
+    align-items: center; /* Align children horizontally in center */
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 0.5em;
+    font-size: 4em; /* Larger font size */
+}
+
+button:hover {
+    background-color: #4048bf;
+}
+
+/* Responsive adjustments */
+@media (max-width: 46.25em) { /* 740px when 1em=16px */
+    .wait-container {
+        padding: 1em;
+        margin: 1em;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    #progressBarContainer, button {
+        width: 100%;
+    }
 }
