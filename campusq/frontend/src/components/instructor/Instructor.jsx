@@ -146,11 +146,6 @@ export default function Instructor() {
             <button>Edit questions</button>
           </Link>
         )}
-        {/* {sessionStatus ? (
-          <h1 className="session-active">Session is active</h1>
-        ) : (
-          <h1 className="session-inactive">Session is not active</h1>
-        )} */}
         {sessionStatus ? (
           <h1 style={{ color: "green" }}>Session is active</h1>
         ) : (
@@ -165,38 +160,4 @@ export default function Instructor() {
       <div className="student-wrapper">{student}</div>
     </div>
   );
-
-  // return (
-  //   <div style={{}}>
-  //     <div id ="user-info">Logged in: {studentName}</div>
-  //     <button onClick={logout}>logout</button>
-  //     <button onClick={addStudent}>Add Student</button>
-  //     <button onClick={inviteStudent}>Invite Student</button>
-  //     <button onClick={activateSession}>Activate Session</button>
-  //     <button onClick={endSession}>End Session</button>
-  //     {sessionStatus ? (
-  //       <div>
-  //         deactivate session to edit questions. This will remove all students
-  //         from queue
-  //       </div>
-  //     ) : (
-  //       <Link to={"/instructor/edit"}>
-  //         <button>Edit questions</button>
-  //       </Link>
-  //     )}
-
-  //     {sessionStatus ? (
-  //       <h1 style={{ color: "green" }}>Session is active</h1>
-  //     ) : (
-  //       <h1 style={{ color: "red" }}>Session is not active</h1>
-  //     )}
-
-  //     <TestView
-  //       code={data.sessioncode}
-  //       questions={questions}
-  //       answers={answers}
-  //     />
-  //     <div className="wrapper">{student}</div>
-  //   </div>
-  // );
 }
