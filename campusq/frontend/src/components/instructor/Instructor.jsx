@@ -54,30 +54,7 @@ export default function Instructor() {
   };
 
   useEffect(() => {
-    const cookies = new Cookies();
-    const session_token = cookies.get("session_token");
-    console.log("all cookies:", cookies.getAll());
-    console.log("session_token:", session_token);
-    const userDataURL = "http://localhost:8000/api/student/info";
-    const headers = {};
-
-    fetch(userDataURL, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setStudentName(data.login_id);
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-      });
+    init();
   }, []);
 
   const activateSession = async () => {
@@ -115,12 +92,12 @@ export default function Instructor() {
 
   const logout = async () => {
     const cookies = new Cookies();
-    cookies.remove("access_token", { path: '/' });
-    cookies.remove("session_token", { path: '/' });
+    cookies.remove("access_token", { path: "/" });
+    cookies.remove("session_token", { path: "/" });
 
-    console.log('Logged out');
+    console.log("Logged out");
 
-    window.location = '/login';
+    window.location = "/login";
   };
 
   console.log("data", data);
@@ -139,7 +116,8 @@ export default function Instructor() {
         <button onClick={endSession}>End Session</button>
         {sessionStatus ? (
           <div>
-            deactivate session to edit questions. This will remove all students from queue
+            deactivate session to edit questions. This will remove all students
+            from queue
           </div>
         ) : (
           <Link to={"/instructor/edit"}>
