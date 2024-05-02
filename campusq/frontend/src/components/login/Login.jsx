@@ -20,14 +20,19 @@ export default function Login() {
 
   return (
     <div id="main">
-      <h1 id="title">CampusQ</h1>
-      <div id="buttons">
-        <button onClick={() => loginPerson("teacher")} className="login-button">
-          Teacher Login
-        </button>
-        <button onClick={() => loginPerson("student")} className="login-button">
-          Student Login
-        </button>
+      <div id="picture">
+        <img src="professor-student-chalkboard.png" alt="CampusQ" />
+      </div>
+      <div id="login">
+        <h1 id="title">CampusQ</h1>
+        {/* <p id="subtitle"> 
+          Welcome to CampusQ, your virtual queue management for office hours. 
+          Login and authenticate below to begin!
+        </p> */}
+        <div id="buttons">
+          <button onClick={() => loginPerson('teacher')} className="login-button">Teacher Login</button>
+          <button onClick={() => loginPerson('student')} className="login-button">Student Login</button>
+        </div>
       </div>
     </div>
   );
