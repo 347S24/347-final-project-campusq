@@ -20,6 +20,7 @@ api = NinjaAPI()
 CURRENT_FE_HOST = 'http://localhost:8500'
 CURRENT_BE_HOST = 'http://localhost:8000'
 
+
 def update_waitlist_positions(waitlist):
     students = Student.objects.filter(waitlist=waitlist).order_by('joined_at')
     for i in range(len(students)):
@@ -51,7 +52,7 @@ def get_student_waitlist_info(request):
     numStudentsInWaitlist = len(Student.objects.filter(waitlist=student.waitlist))
     position = student.position
     return JsonResponse({"position": f"{position}", "totalInQ": f"{numStudentsInWaitlist}"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200)
-CURRENT_BE_HOST = 'onse({"position": f"{position}", "totalInQ": f"{numStudentsInWaitlist}"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200'
+
     
 
 @api.post("/api/leave_waitlist")
@@ -69,7 +70,7 @@ def leave_waitlist(request):
     print("student:", student.waitlist)
     
     return JsonResponse({"message": "Left waitlist"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200)
-CURRENT_BE_HOST = 'onse({"message": "Left waitlist"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200'
+
 @api.get("/api/instructor/info")
 def get_instructor_info(request):
 
@@ -77,7 +78,7 @@ def get_instructor_info(request):
     session_token = request.COOKIES.get('session_token', None)
     headers = {
         "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-    }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
+    }
     if session_token == None:
         print("No cookies")
         return JsonResponse({"error": "No access token provided"}, status=400, headers=headers)
@@ -129,7 +130,7 @@ def get_instructor_info(request):
 def get_office_hour_session(request, code: str):
     headers = {
         "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-    }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
+    }
     print("tttttt")
     print("code:", code)
 
@@ -162,7 +163,7 @@ def join_office_hours(request):
     print("attempting to get questions")
     headers = {
         "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-CURRENT_BE_HOST = 'trol-Allow-Origin": CURRENT_FE_HOST'
+
     }
     try:
         code = request.GET.get('code', '')
@@ -184,7 +185,7 @@ def submit_question(request):
 
     responseHeaders = {
         "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-    }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
+    }
     
 
     
@@ -291,9 +292,9 @@ def canvas_login_callback(request):
     
     if state == "student":
         redirect_url = f"{CURRENT_FE_HOST}/student/code"
-    else:CURRENT_BE_HOST = 'RRENT_FE_HOST}/student/code'
+    else:
         redirect_url = f"{CURRENT_FE_HOST}/instructor"
-    redirect_response = HttpResponseCURRENT_BE_HOST         redirect_url = f"{CURRENT_FE_HOST}/instructor"= ''Redirect(redirect_url)
+    redirect_response = HttpResponseRedirect(redirect_url)
     
     redirect_response.set_cookie('session_token', session_token, samesite="Lax", domain="localhost", path="/")
     redirect_response.set_cookie('canvas_id', canvas_id, samesite="Lax", domain="localhost", path="/")
@@ -347,7 +348,7 @@ def get_student_info(request):
     response = JsonResponse({'login_id': login_id}, status=200)
     response["Content-Type"] = "application/json"
     response["Access-Control-Allow-Origin"] = CURRENT_FE_HOST
-    CURRENT_BE_HOST = 'ntrol-Allow-Origin"] = CURRENT_FE_HOS'
+    
     
 
     
@@ -390,7 +391,7 @@ def show_waitlist(request, waitcode="none"):
 def deactivate_session(request):
     headers = {
             "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
+        }
     [print("cookie:", cookie) for cookie in request.COOKIES.items()]
     
     try:
@@ -413,7 +414,7 @@ def deactivate_session(request):
 def activate_session(request):
     headers = {
             "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
+        }
     [print("cookie:", cookie) for cookie in request.COOKIES.items()]
     
     try:
@@ -439,7 +440,7 @@ def get_proffesor_questions(request):
     
     headers = {
             "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
+        }
     
     
     try:
@@ -459,7 +460,7 @@ def get_proffesor_questions(request):
 def save_proffesor_questions(request):
     headers = {
             "Access-Control-Allow-Origin": CURRENT_FE_HOST,
-        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
+        }
     data = json.loads(request.body.decode('utf-8'))
     print("data:", data)
     try:
