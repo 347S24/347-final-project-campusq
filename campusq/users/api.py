@@ -16,6 +16,9 @@ from django.utils import timezone
 
 api = NinjaAPI()
 
+#probably could pull this out of the environment somehow
+CURRENT_FE_HOST = 'http://localhost:8500'
+CURRENT_BE_HOST = 'http://localhost:8000'
 
 def update_waitlist_positions(waitlist):
     students = Student.objects.filter(waitlist=waitlist).order_by('joined_at')
@@ -47,8 +50,8 @@ def get_student_waitlist_info(request):
     print("student waitlist:", student.waitlist)
     numStudentsInWaitlist = len(Student.objects.filter(waitlist=student.waitlist))
     position = student.position
-    return JsonResponse({"position": f"{position}", "totalInQ": f"{numStudentsInWaitlist}"}, headers={"Access-Control-Allow-Origin": "http://localhost:8500"}, status=200)
-
+    return JsonResponse({"position": f"{position}", "totalInQ": f"{numStudentsInWaitlist}"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200)
+CURRENT_BE_HOST = 'onse({"position": f"{position}", "totalInQ": f"{numStudentsInWaitlist}"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200'
     
 
 @api.post("/api/leave_waitlist")
@@ -65,16 +68,16 @@ def leave_waitlist(request):
     student.save()
     print("student:", student.waitlist)
     
-    return JsonResponse({"message": "Left waitlist"}, headers={"Access-Control-Allow-Origin": "http://localhost:8500"}, status=200)
-
+    return JsonResponse({"message": "Left waitlist"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200)
+CURRENT_BE_HOST = 'onse({"message": "Left waitlist"}, headers={"Access-Control-Allow-Origin": CURRENT_FE_HOST}, status=200'
 @api.get("/api/instructor/info")
 def get_instructor_info(request):
 
 
     session_token = request.COOKIES.get('session_token', None)
     headers = {
-        "Access-Control-Allow-Origin": "http://localhost:8500",
-    }
+        "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+    }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
     if session_token == None:
         print("No cookies")
         return JsonResponse({"error": "No access token provided"}, status=400, headers=headers)
@@ -125,8 +128,8 @@ def get_instructor_info(request):
 @api.get("/api/officehoursession/{code}")
 def get_office_hour_session(request, code: str):
     headers = {
-        "Access-Control-Allow-Origin": "http://localhost:8500",
-    }
+        "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+    }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
     print("tttttt")
     print("code:", code)
 
@@ -158,8 +161,8 @@ def get_office_hour_session(request, code: str):
 def join_office_hours(request):
     print("attempting to get questions")
     headers = {
-        "Access-Control-Allow-Origin": "http://localhost:8500",
-
+        "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+CURRENT_BE_HOST = 'trol-Allow-Origin": CURRENT_FE_HOST'
     }
     try:
         code = request.GET.get('code', '')
@@ -180,8 +183,8 @@ def submit_question(request):
     data = json.loads(request.body.decode('utf-8'))
 
     responseHeaders = {
-        "Access-Control-Allow-Origin": "http://localhost:8500",
-    }
+        "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+    }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
     
 
     
@@ -231,7 +234,7 @@ def canvas_login_callback(request):
 
 
     absolute_uri = request.build_absolute_uri()
-    get_token_url = "https://canvas.jmu.edu/login/oauth2/token?grant_type=authorization_code&client_id=190000000000938&client_secret=DUyraGNa3kmVHMK54NH1D4po5CF7XXSeyHeCE4ebaHTgeTCEnl0QTixPL569NUe9&redirect_uri=http://localhost:8000/accounts/canvas/login/callback/&code=" + code
+    get_token_url = f"https://canvas.jmu.edu/login/oauth2/token?grant_type=authorization_code&client_id=190000000000938&client_secret=DUyraGNa3kmVHMK54NH1D4po5CF7XXSeyHeCE4ebaHTgeTCEnl0QTixPL569NUe9&redirect_uri={CURRENT_BE_HOST}/accounts/canvas/login/callback/&code=" + code
     response = requests.post(get_token_url)
     data = response.json()
     print("data:", data)
@@ -287,10 +290,10 @@ def canvas_login_callback(request):
 
     
     if state == "student":
-        redirect_url = f"http://localhost:8500/student/code"
-    else:
-        redirect_url = f"http://localhost:8500/instructor"
-    redirect_response = HttpResponseRedirect(redirect_url)
+        redirect_url = f"{CURRENT_FE_HOST}/student/code"
+    else:CURRENT_BE_HOST = 'RRENT_FE_HOST}/student/code'
+        redirect_url = f"{CURRENT_FE_HOST}/instructor"
+    redirect_response = HttpResponseCURRENT_BE_HOST         redirect_url = f"{CURRENT_FE_HOST}/instructor"= ''Redirect(redirect_url)
     
     redirect_response.set_cookie('session_token', session_token, samesite="Lax", domain="localhost", path="/")
     redirect_response.set_cookie('canvas_id', canvas_id, samesite="Lax", domain="localhost", path="/")
@@ -343,8 +346,8 @@ def get_student_info(request):
 
     response = JsonResponse({'login_id': login_id}, status=200)
     response["Content-Type"] = "application/json"
-    response["Access-Control-Allow-Origin"] = "http://localhost:8500"
-    
+    response["Access-Control-Allow-Origin"] = CURRENT_FE_HOST
+    CURRENT_BE_HOST = 'ntrol-Allow-Origin"] = CURRENT_FE_HOS'
     
 
     
@@ -386,8 +389,8 @@ def show_waitlist(request, waitcode="none"):
 @api.post("/api/deactivate_session")
 def deactivate_session(request):
     headers = {
-            "Access-Control-Allow-Origin": "http://localhost:8500",
-        }
+            "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
     [print("cookie:", cookie) for cookie in request.COOKIES.items()]
     
     try:
@@ -409,8 +412,8 @@ def deactivate_session(request):
 @api.post("/api/activate_session")
 def activate_session(request):
     headers = {
-            "Access-Control-Allow-Origin": "http://localhost:8500",
-        }
+            "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
     [print("cookie:", cookie) for cookie in request.COOKIES.items()]
     
     try:
@@ -435,8 +438,8 @@ def get_proffesor_questions(request):
     
     
     headers = {
-            "Access-Control-Allow-Origin": "http://localhost:8500",
-        }
+            "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
     
     
     try:
@@ -455,8 +458,8 @@ def get_proffesor_questions(request):
 @api.post("/api/instructor_questions/save")
 def save_proffesor_questions(request):
     headers = {
-            "Access-Control-Allow-Origin": "http://localhost:8500",
-        }
+            "Access-Control-Allow-Origin": CURRENT_FE_HOST,
+        }CURRENT_BE_HOST = 'Allow-Origin": CURRENT_FE_HOST'
     data = json.loads(request.body.decode('utf-8'))
     print("data:", data)
     try:
