@@ -275,6 +275,6 @@ campusq/media/
 
 .pytest_cache/
 
-**/static/assets/
+#**/static/assets/
 
-campusq/templates/
+#campusq/templates/

@@ -5,7 +5,7 @@ html, body {
   height: 100%; /* Full viewport height */
   margin: 0; /* Remove default margin */
   padding: 0; /* Remove default padding */
-  background-color: #DACCE6; /* Consistent light purple background for a clean look */
+  background-color: white; /* Consistent light purple background for a clean look */
   color: #333; /* Default text color set to slate gray for better readability */
   box-sizing: border-box; /* Border-box sizing for all elements */
 }
