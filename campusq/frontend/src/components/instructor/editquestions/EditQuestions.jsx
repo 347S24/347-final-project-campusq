@@ -16,11 +16,7 @@ const QuestionBar = ({ id, deleteQuestion, question, updateQuestion }) => {
         onChange={(e) => updateQuestion(id, e.target.value)}
       />
 
-      <button
-        className="generic-button"
-        id="question-bar-delete"
-        onClick={() => deleteQuestion(id)}
-      >
+      <button className="generic-button" onClick={() => deleteQuestion(id)}>
         delete
       </button>
     </div>
@@ -154,15 +150,24 @@ export default function EditQuestions() {
         </button>{" "}
         {/*On click, this will send a post request to our
                                    api to update the database*/}
-        {Object.values(questions).map((question) => (
-          <QuestionBar
-            key={question.id}
-            id={question.id}
-            deleteQuestion={deleteQuestion}
-            question={question.question}
-            updateQuestion={updateQuestion}
-          />
-        ))}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {Object.values(questions).map((question) => (
+            <QuestionBar
+              key={question.id}
+              id={question.id}
+              deleteQuestion={deleteQuestion}
+              question={question.question}
+              updateQuestion={updateQuestion}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

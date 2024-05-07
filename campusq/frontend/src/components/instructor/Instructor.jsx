@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import TestView from "../../TestView.jsx";
 import Cookies from "universal-cookie";
+import { set } from "mongoose";
 
 export default function Instructor() {
   const [student, setStudent] = useState([]);
@@ -47,6 +48,7 @@ export default function Instructor() {
       setCode(jsonData.sessioncode);
       setQuestions(jsonData.questions);
       setAnswers(jsonData.answers);
+      setStudentName(jsonData.name);
       setSessionStatus(jsonData.sessionStatus);
     } else {
       console.error("Failed to fetch instructor info");
@@ -110,15 +112,11 @@ export default function Instructor() {
         <button onClick={logout}>Logout</button>
       </header>
       <div className="session-controls">
-        <button onClick={addStudent}>Add Student</button>
         <button onClick={inviteStudent}>Invite Student</button>
         <button onClick={activateSession}>Activate Session</button>
         <button onClick={endSession}>End Session</button>
         {sessionStatus ? (
-          <div>
-            deactivate session to edit questions. This will remove all students
-            from queue
-          </div>
+          <div></div>
         ) : (
           <Link to={"/instructor/edit"}>
             <button>Edit questions</button>

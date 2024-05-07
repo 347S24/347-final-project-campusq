@@ -33,6 +33,28 @@ def hello(request, name="world"):
     return f"Hello {name}"
 
 
+@api.post("/invite_student")
+def invite_student(request):
+    session_cookie = request.COOKIES.get('session_token', None)
+    headers = {
+        "Access-Control-Allow-Origin": CURRENT_FE_HOST
+    }
+    if session_cookie == None:
+        return JsonResponse({"error": "No session token provided"}, status=400, headers=headers)
+    
+    user = SessionToken.objects.get(session_token=session_cookie).user
+    professor = Professor.objects.get(user=user)
+    session = OfficeHourSession.objects.get(professor=professor, is_active=True)
+    waitlist = Waitlist.objects.get(session=session)
+    topStudent = Student.objects.filter(session=session).order_by('joined_at').first()
+    topStudent.waitlist = None
+    topStudent.save()
+    update_waitlist_positions(waitlist)
+    return JsonResponse({"message": "Student invited"}, status=200, headers=headers)
+
+
+
+
 @api.get("/user")
 def get_user_by_name(request, name: str):
     try:
@@ -318,6 +340,7 @@ def get_student_info(request):
     
     session_token_object = SessionToken.objects.get(session_token=session_token)
     access_token = session_token_object.access_token
+    user = session_token_object.user
     
     headers = {
     "Authorization": f"Bearer {access_token}",
@@ -345,7 +368,7 @@ def get_student_info(request):
     data = apiResponse.json()
     login_id = data.get('login_id', None)
 
-    response = JsonResponse({'login_id': login_id}, status=200)
+    response = JsonResponse({'login_id': user.name}, status=200)
     response["Content-Type"] = "application/json"
     response["Access-Control-Allow-Origin"] = CURRENT_FE_HOST
     
