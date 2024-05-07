@@ -492,6 +492,10 @@ def save_proffesor_questions(request):
         session = OfficeHourSession.objects.get(professor=Professor.objects.get(user=user))
         questions = data.get('questions')
         SessionQuestion.objects.filter(session=session).delete()
+        students = Student.objects.filter(waitlist=Waitlist.objects.get(session=session))
+        for student in students:
+            student.waitlist = None
+            student.save()
         
         for question in questions:
             SessionQuestion.objects.create(session=session, question=question)
