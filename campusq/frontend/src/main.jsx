@@ -9,41 +9,48 @@ import WaitRoom from "./components/instructor/waitroom/WaitRoom.jsx"; // Ensure 
 import StudentQuestions from "./components/student/studentquestions/StudentQuestions.jsx";
 import Dashboard from "./components/instructor/dashboard/Dashboard.jsx";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Cookies from "universal-cookie";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import TestView from "./TestView.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    children: [
+      {
+        path: "/student/code",
+        element: <StudentCode />,
+      },
+      {
+        path: "/student/questions",
+        element: <StudentQuestions />,
+      },
+      {
+        path: "/instructor",
+        element: <Instructor />,
+      },
+      {
+        path: "/instructor/edit",
+        element: <EditQuestions />,
+      },
+      {
+        path: "/student/waitroom",
+        element: <WaitRoom />,
+      },
+      {
+        path: "/test/:code",
+        element: <TestView />,
+      },
+    ],
   },
   {
     path: "/login",
     element: <Login />,
-  },
-  {
-    path: "/student/code",
-    element: <StudentCode />,
-  },
-  {
-    path: "/student/questions",
-    element: <StudentQuestions />,
-  },
-  {
-    path: "/instructor",
-    element: <Instructor />,
-  },
-  {
-    path: "/instructor/edit",
-    element: <EditQuestions />,
-  },
-  {
-    path: "/student/waitroom",
-    element: <WaitRoom />,
-  },
-  {
-    path: "/test/:code",
-    element: <TestView />,
   },
 ]);
 
